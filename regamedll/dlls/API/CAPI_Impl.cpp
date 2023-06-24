@@ -30,40 +30,84 @@
 
 CReGameHookchains g_ReGameHookchains;
 
-int EXT_FUNC Cmd_Argc_api() {
+EXT_FUNC void Regamedll_ChangeString_api(char *&dest, const char *source)
+{
+	size_t len = Q_strlen(source);
+	if (dest == nullptr || Q_strlen(dest) != len) {
+		delete [] dest;
+		dest = new char [len + 1];
+	}
+
+	Q_strcpy(dest, source);
+}
+
+EXT_FUNC void RadiusDamage_api(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType)
+{
+	RadiusDamage(vecSrc, pevInflictor, pevAttacker, flDamage, flRadius, iClassIgnore, bitsDamageType);
+}
+
+EXT_FUNC void ClearMultiDamage_api()
+{
+	ClearMultiDamage();
+}
+
+EXT_FUNC void ApplyMultiDamage_api(entvars_t *pevInflictor, entvars_t *pevAttacker)
+{
+	ApplyMultiDamage(pevInflictor, pevAttacker);
+}
+
+EXT_FUNC void AddMultiDamage_api(entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType)
+{
+	AddMultiDamage(pevInflictor, pEntity, flDamage, bitsDamageType);
+}
+
+EXT_FUNC int Cmd_Argc_api() {
 	return CMD_ARGC_();
 }
 
-const char *EXT_FUNC Cmd_Argv_api(int i) {
+EXT_FUNC const char* Cmd_Argv_api(int i) {
 	return CMD_ARGV_(i);
 }
 
-CGrenade *PlantBomb_api(entvars_t *pevOwner, Vector &vecStart, Vector &vecVelocity) {
+EXT_FUNC CGrenade *PlantBomb_api(entvars_t *pevOwner, Vector &vecStart, Vector &vecVelocity) {
 	return CGrenade::ShootSatchelCharge(pevOwner, vecStart, vecVelocity);
 }
 
-CGib *SpawnHeadGib_api(entvars_t *pevVictim) {
+EXT_FUNC CGib *SpawnHeadGib_api(entvars_t *pevVictim) {
 	return CGib::SpawnHeadGib(pevVictim);
 }
 
-void SpawnRandomGibs_api(entvars_t *pevVictim, int cGibs, int human) {
+EXT_FUNC void SpawnRandomGibs_api(entvars_t *pevVictim, int cGibs, int human) {
 	CGib::SpawnRandomGibs(pevVictim, cGibs, human);
 }
 
+EXT_FUNC void UTIL_RestartOther_api(const char *szClassname) {
+	UTIL_RestartOther(szClassname);
+}
+
+EXT_FUNC void UTIL_ResetEntities_api() {
+	UTIL_ResetEntities();
+}
+
+EXT_FUNC void UTIL_RemoveOther_api(const char *szClassname, int nCount)
+{
+	UTIL_RemoveOther(szClassname, nCount);
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
-	&CREATE_NAMED_ENTITY,
+	CREATE_NAMED_ENTITY,
 
-	&Regamedll_ChangeString_api,
+	Regamedll_ChangeString_api,
 
-	&RadiusDamage_api,
-	&ClearMultiDamage_api,
-	&ApplyMultiDamage_api,
-	&AddMultiDamage_api,
+	RadiusDamage_api,
+	ClearMultiDamage_api,
+	ApplyMultiDamage_api,
+	AddMultiDamage_api,
 
-	&UTIL_FindEntityByString,
+	UTIL_FindEntityByString,
 
-	&AddEntityHashValue,
-	&RemoveEntityHashValue,
+	AddEntityHashValue,
+	RemoveEntityHashValue,
 
 	Cmd_Argc_api,
 	Cmd_Argv_api,
@@ -269,50 +313,6 @@ bool CReGameApi::BGetIGameRules(const char *pchVersion) const
 	}
 
 	return false;
-}
-
-EXT_FUNC void Regamedll_ChangeString_api(char *&dest, const char *source)
-{
-	size_t len = Q_strlen(source);
-	if (dest == nullptr || Q_strlen(dest) != len) {
-		delete [] dest;
-		dest = new char [len + 1];
-	}
-
-	Q_strcpy(dest, source);
-}
-
-EXT_FUNC void RadiusDamage_api(Vector vecSrc, entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType)
-{
-	RadiusDamage(vecSrc, pevInflictor, pevAttacker, flDamage, flRadius, iClassIgnore, bitsDamageType);
-}
-
-EXT_FUNC void ClearMultiDamage_api()
-{
-	ClearMultiDamage();
-}
-
-EXT_FUNC void ApplyMultiDamage_api(entvars_t *pevInflictor, entvars_t *pevAttacker)
-{
-	ApplyMultiDamage(pevInflictor, pevAttacker);
-}
-
-EXT_FUNC void AddMultiDamage_api(entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType)
-{
-	AddMultiDamage(pevInflictor, pEntity, flDamage, bitsDamageType);
-}
-
-EXT_FUNC void UTIL_RestartOther_api(const char *szClassname) {
-	UTIL_RestartOther(szClassname);
-}
-
-EXT_FUNC void UTIL_ResetEntities_api() {
-	UTIL_ResetEntities();
-}
-
-EXT_FUNC void UTIL_RemoveOther_api(const char *szClassname, int nCount)
-{
-	UTIL_RemoveOther(szClassname, nCount);
 }
 
 EXPOSE_SINGLE_INTERFACE(CReGameApi, IReGameApi, VRE_GAMEDLL_API_VERSION);
