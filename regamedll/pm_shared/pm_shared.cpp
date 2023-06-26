@@ -2464,6 +2464,25 @@ void PM_Jump()
 		PM_PlayStepSound(PM_MapTextureTypeStepType(pmove->chtexturetype), fvol);
 	}
 
+#ifdef REGAMEDLL_API
+	auto PM_JumpHeight = [&player](bool longjump)
+#else 
+	auto PM_JumpHeight = [&](bool longjump)
+#endif
+	{
+#ifdef REGAMEDLL_API
+		if(longjump)
+		{
+			if(player->m_flLongJumpHeight > 0.0)
+				return player->m_flLongJumpHeight;
+		}
+		else if(player->m_flJumpHeight > 0.0)
+			return player->m_flJumpHeight;
+#endif
+
+		return Q_sqrt(2.0 * 800.0f * (longjump ? 56.0f : 45.0f));
+	}
+
 #ifdef REGAMEDLL_ADD
 	// See if user can super long jump?
 	bool cansuperjump = (pmove->PM_Info_ValueForKey(pmove->physinfo, "slj")[0] == '1');
@@ -2478,23 +2497,28 @@ void PM_Jump()
 		{
 			pmove->punchangle[0] = -5.0f;
 
-			for (int i  = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
-				pmove->velocity[i] = pmove->forward[i] * PLAYER_LONGJUMP_SPEED * 1.6f;
+				pmove->velocity[i] = pmove->forward[i] * 
+#ifdef REGAMEDLL_API
+									(player->m_flLongJumpForce > 0.0) ? 
+										player->m_flLongJumpForce : 
+#endif
+										(PLAYER_LONGJUMP_SPEED * 1.6f);
 			}
 
-			pmove->velocity[2] = Q_sqrt(2 * 800 * 56.0f);
+			pmove->velocity[2] = PM_JumpHeight(true);
 		}
 		else
 		{
-			pmove->velocity[2] = Q_sqrt(2 * 800 * 45.0f);
+			pmove->velocity[2] = PM_JumpHeight(false);
 		}
 	}
 	else
 #endif
 	{
 		// NOTE: don't do it in .f (float)
-		pmove->velocity[2] = Q_sqrt(2.0 * 800.0f * 45.0f);
+		pmove->velocity[2] = PM_JumpHeight(false);
 	}
 
 	if (pmove->fuser2 > 0.0f)
