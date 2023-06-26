@@ -139,9 +139,9 @@ public:
 	bool m_bMegaBunnyJumping;
 	bool m_bPlantC4Anywhere;
 	bool m_bSpawnProtectionEffects;
-	float m_flJumpHeight; 
-	float m_flLongJumpHeight; 
-	float m_flLongJumpForce; 
+	double m_flJumpHeight; 
+	double m_flLongJumpHeight; 
+	double m_flLongJumpForce; 
 };
 
 // Inlines
