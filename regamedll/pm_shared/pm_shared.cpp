@@ -2481,7 +2481,7 @@ void PM_Jump()
 #endif
 
 		return Q_sqrt(2.0 * 800.0f * (longjump ? 56.0f : 45.0f));
-	}
+	};
 
 #ifdef REGAMEDLL_ADD
 	// See if user can super long jump?
@@ -2499,12 +2499,16 @@ void PM_Jump()
 
 			for (int i = 0; i < 2; i++)
 			{
-				pmove->velocity[i] = pmove->forward[i] * 
 #ifdef REGAMEDLL_API
-									(player->m_flLongJumpForce > 0.0) ? 
-										player->m_flLongJumpForce : 
+				if(player->m_flLongJumpForce > 0.0)
+				{
+					VectorScale(pmove->forward, player->m_flLongJumpForce, pmove->velocity);
+				}
+				else
 #endif
-										(PLAYER_LONGJUMP_SPEED * 1.6f);
+				{
+					VectorScale(pmove->forward, PLAYER_LONGJUMP_SPEED * 1.6f, pmove->velocity);
+				}
 			}
 
 			pmove->velocity[2] = PM_JumpHeight(true);
