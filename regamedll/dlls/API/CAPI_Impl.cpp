@@ -94,6 +94,31 @@ EXT_FUNC void UTIL_RemoveOther_api(const char *szClassname, int nCount)
 	UTIL_RemoveOther(szClassname, nCount);
 }
 
+EXT_FUNC void UTIL_DecalTrace_api(TraceResult *pTrace, int decalNumber)
+{
+	UTIL_DecalTrace(pTrace, decalNumber);
+}
+
+EXT_FUNC void UTIL_Remove_api(CBaseEntity *pEntity)
+{
+	UTIL_Remove(pEntity);
+}
+
+EXT_FUNC void AddAmmoNameToAmmoRegistry_api(const char *szAmmoname)
+{
+	AddAmmoNameToAmmoRegistry(szAmmoname);
+}
+
+EXT_FUNC CWeaponBox *CreateWeaponBox_api(CBasePlayerItem *pItem, CBasePlayer *pPlayerOwner, const char *modelName, Vector &origin, Vector &angles, Vector &velocity, float lifeTime, bool packAmmo)
+{
+	return CreateWeaponBox(pItem, pPlayerOwner, modelName, origin, angles, velocity, lifeTime < 0.0 ? CGameRules::GetItemKillDelay() : lifeTime, packAmmo);
+}
+
+EXT_FUNC void TextureTypePlaySound_api(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType)
+{
+	TEXTURETYPE_PlaySound(ptr, vecSrc, vecEnd, iBulletType);
+}
+
 ReGameFuncs_t g_ReGameApiFuncs = {
 	CREATE_NAMED_ENTITY,
 
@@ -120,6 +145,12 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 	UTIL_RestartOther_api,
 	UTIL_ResetEntities_api,
 	UTIL_RemoveOther_api,
+	UTIL_DecalTrace_api,
+	UTIL_Remove_api,
+
+	AddAmmoNameToAmmoRegistry_api,
+	CreateWeaponBox_api,
+	TextureTypePlaySound_api,
 };
 
 GAMEHOOK_REGISTRY(CBasePlayer_Spawn);
