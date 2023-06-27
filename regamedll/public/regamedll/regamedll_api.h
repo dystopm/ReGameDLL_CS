@@ -692,16 +692,16 @@ public:
 
 	virtual IReGameHookRegistry_FreeGameRules *FreeGameRules() = 0;
 
-	virtual IReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint *CBasePlayer_EntSelectSpawnPoint();
+	virtual IReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint *CBasePlayer_EntSelectSpawnPoint() = 0;
 
-	virtual IReGameHookRegistry_ClearMultiDamage *ClearMultiDamage();
-	virtual IReGameHookRegistry_AddMultiDamage *AddMultiDamage();
-	virtual IReGameHookRegistry_ApplyMultiDamage *ApplyMultiDamage();
+	virtual IReGameHookRegistry_ClearMultiDamage *ClearMultiDamage() = 0;
+	virtual IReGameHookRegistry_AddMultiDamage *AddMultiDamage() = 0;
+	virtual IReGameHookRegistry_ApplyMultiDamage *ApplyMultiDamage() = 0;
 
-	virtual IReGameHookRegistry_PM_Jump *PM_Jump();
-	virtual IReGameHookRegistry_PM_Duck *PM_Duck();
-	virtual IReGameHookRegistry_PM_CheckWaterJump *PM_CheckWaterJump();
-	virtual IReGameHookRegistry_PM_LadderMove *PM_PM_LadderMove();
+	virtual IReGameHookRegistry_PM_Jump *PM_Jump() = 0;
+	virtual IReGameHookRegistry_PM_Duck *PM_Duck() = 0;
+	virtual IReGameHookRegistry_PM_CheckWaterJump *PM_CheckWaterJump() = 0;
+	virtual IReGameHookRegistry_PM_LadderMove *PM_PM_LadderMove() = 0;
 };
 
 struct ReGameFuncs_t {
