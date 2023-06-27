@@ -1863,7 +1863,14 @@ void PM_UnDuck()
 	}
 }
 
-void PM_Duck()
+LINK_HOOK_VOID_CHAIN(PM_Duck, (int playerIndex = 0), pmove->player_index + 1);
+
+void EXT_FUNC __API_HOOK(PM_Duck)(int playerIndex)
+{
+	PM_Duck_internal();
+}
+
+void PM_Duck_internal()
 {
 	int buttonsChanged = (pmove->oldbuttons ^ pmove->cmd.buttons);	// These buttons have changed this frame
 	int nButtonPressed =  buttonsChanged & pmove->cmd.buttons;		// The changed ones still down are "pressed"
@@ -1967,7 +1974,14 @@ void PM_Duck()
 	}
 }
 
-void PM_LadderMove(physent_t *pLadder)
+LINK_HOOK_VOID_CHAIN(PM_LadderMove, (physent_t *pLadder, int playerIndex = 0), pLadder, pmove->player_index + 1);
+
+void EXT_FUNC __API_HOOK(PM_LadderMove)(physent_t *pLadder, int playerIndex)
+{
+	PM_LadderMove_internal(pLadder);
+}
+
+void PM_LadderMove_internal(physent_t *pLadder)
 {
 	vec3_t ladderCenter;
 	trace_t trace;
@@ -2342,7 +2356,14 @@ void PM_PreventMegaBunnyJumping()
 	VectorScale(pmove->velocity, fraction, pmove->velocity);
 }
 
-void PM_Jump()
+LINK_HOOK_VOID_CHAIN(PM_Jump, (int playerIndex = 0), pmove->player_index + 1);
+
+void EXT_FUNC __API_HOOK(PM_Jump)(int playerIndex)
+{
+	PM_Jump_internal();
+}
+
+void PM_Jump_internal()
 {
 	if (pmove->dead)
 	{
@@ -2479,7 +2500,6 @@ void PM_Jump()
 		else if(player->m_flJumpHeight > 0.0)
 			return player->m_flJumpHeight;
 #endif
-
 		return Q_sqrt(2.0 * 800.0f * (longjump ? 56.0f : 45.0f));
 	};
 
@@ -2497,18 +2517,15 @@ void PM_Jump()
 		{
 			pmove->punchangle[0] = -5.0f;
 
-			for (int i = 0; i < 2; i++)
-			{
 #ifdef REGAMEDLL_API
-				if(player->m_flLongJumpForce > 0.0)
-				{
-					VectorScale(pmove->forward, player->m_flLongJumpForce, pmove->velocity);
-				}
-				else
+			if(player->m_flLongJumpForce > 0.0)
+			{
+				VectorScale(pmove->forward, player->m_flLongJumpForce, pmove->velocity);
+			}
+			else
 #endif
-				{
-					VectorScale(pmove->forward, PLAYER_LONGJUMP_SPEED * 1.6f, pmove->velocity);
-				}
+			{
+				VectorScale(pmove->forward, PLAYER_LONGJUMP_SPEED * 1.6f, pmove->velocity);
 			}
 
 			pmove->velocity[2] = PM_JumpHeight(true);
@@ -2542,7 +2559,14 @@ void PM_Jump()
 	pmove->oldbuttons |= IN_JUMP;
 }
 
-void PM_CheckWaterJump()
+LINK_HOOK_VOID_CHAIN(PM_CheckWaterJump, (int playerIndex = 0), pmove->player_index + 1);
+
+void EXT_FUNC __API_HOOK(PM_CheckWaterJump)(int playerIndex)
+{
+	PM_CheckWaterJump_internal();
+}
+
+void PM_CheckWaterJump_internal()
 {
 	vec3_t vecStart, vecEnd;
 	vec3_t flatforward;
