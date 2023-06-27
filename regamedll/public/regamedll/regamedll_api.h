@@ -524,6 +524,38 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChain<void, class CGameRules **> IReGameHook_FreeGameRules;
 typedef IHookChainRegistry<void, class CGameRules **> IReGameHookRegistry_FreeGameRules;
 
+// CBasePlayer::EntSelectSpawnPoint hook
+typedef IHookChainClass<edict_t *, CBasePlayer> IReGameHook_EntSelectSpawnPoint;
+typedef IHookChainRegistryClass<edict_t *, CBasePlayer> IReGameHookRegistry_EntSelectSpawnPoint;
+
+// ClearMultiDamage hook
+typedef IHookChain<void> IReGameHook_ClearMultiDamage;
+typedef IHookChainRegistry<void> IReGameHookRegistry_ClearMultiDamage;
+
+// AddMultiDamage hook
+typedef IHookChain<void, entvars_t *, CBaseEntity *, float, int> IReGameHook_AddMultiDamage;
+typedef IHookChainRegistry<void, entvars_t *, CBaseEntity *, float, int> IReGameHookRegistry_AddMultiDamage;
+
+// ApplyMultiDamage hook
+typedef IHookChain<void, entvars_t *, entvars_t *> IReGameHook_ApplyMultiDamage;
+typedef IHookChainRegistry<void, entvars_t *, entvars_t *> IReGameHookRegistry_ApplyMultiDamage;
+
+// PM_Jump hook
+typedef IHookChain<void, int> IReGameHook_PM_Jump;
+typedef IHookChainRegistry<void, int> IReGameHookRegistry_PM_Jump;
+
+// PM_Duck hook
+typedef IHookChain<void, int> IReGameHook_PM_Duck;
+typedef IHookChainRegistry<void, int> IReGameHookRegistry_PM_Duck;
+
+// PM_CheckWaterJump hook
+typedef IHookChain<void, int> IReGameHook_PM_CheckWaterJump;
+typedef IHookChainRegistry<void, int> IReGameHookRegistry_PM_CheckWaterJump;
+
+// PM_LadderMove hook
+typedef IHookChain<void, physent_t *, int> IReGameHook_PM_LadderMove;
+typedef IHookChainRegistry<void, physent_t *, int> IReGameHookRegistry_PM_LadderMove;
+
 class IReGameHookchains {
 public:
 	virtual ~IReGameHookchains() {}
@@ -659,6 +691,17 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_JoiningThink *CBasePlayer_JoiningThink() = 0;
 
 	virtual IReGameHookRegistry_FreeGameRules *FreeGameRules() = 0;
+
+	virtual IReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint *CBasePlayer_EntSelectSpawnPoint();
+
+	virtual IReGameHookRegistry_ClearMultiDamage *ClearMultiDamage();
+	virtual IReGameHookRegistry_AddMultiDamage *AddMultiDamage();
+	virtual IReGameHookRegistry_ApplyMultiDamage *ApplyMultiDamage();
+
+	virtual IReGameHookRegistry_PM_Jump *PM_Jump();
+	virtual IReGameHookRegistry_PM_Duck *PM_Duck();
+	virtual IReGameHookRegistry_PM_CheckWaterJump *PM_CheckWaterJump();
+	virtual IReGameHookRegistry_PM_LadderMove *PM_PM_LadderMove();
 };
 
 struct ReGameFuncs_t {
