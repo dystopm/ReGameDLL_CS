@@ -2117,3 +2117,9 @@ void AddAmmoNameToAmmoRegistry(const char *szAmmoname);
 void UTIL_PrecacheOtherWeapon(const char *szClassname);
 BOOL CanAttack(float attack_time, float curtime, BOOL isPredicted);
 float GetBaseAccuracy(WeaponIdType id);
+
+#ifdef REGAMEDLL_API
+void ClearMultiDamage_OrigFunc();
+void ApplyMultiDamage_OrigFunc(entvars_t *pevInflictor, entvars_t *pevAttacker);
+void AddMultiDamage_OrigFunc(entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType);
+#endif
