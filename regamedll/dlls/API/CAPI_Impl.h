@@ -965,7 +965,7 @@ public:
 	virtual IReGameHookRegistry_PM_Jump *PM_Jump();
 	virtual IReGameHookRegistry_PM_Duck *PM_Duck();
 	virtual IReGameHookRegistry_PM_CheckWaterJump *PM_CheckWaterJump();
-	virtual IReGameHookRegistry_PM_LadderMove *PM_PM_LadderMove();
+	virtual IReGameHookRegistry_PM_LadderMove *PM_LadderMove();
 };
 
 extern CReGameHookchains g_ReGameHookchains;

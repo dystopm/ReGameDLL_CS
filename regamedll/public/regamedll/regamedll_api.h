@@ -701,7 +701,7 @@ public:
 	virtual IReGameHookRegistry_PM_Jump *PM_Jump() = 0;
 	virtual IReGameHookRegistry_PM_Duck *PM_Duck() = 0;
 	virtual IReGameHookRegistry_PM_CheckWaterJump *PM_CheckWaterJump() = 0;
-	virtual IReGameHookRegistry_PM_LadderMove *PM_PM_LadderMove() = 0;
+	virtual IReGameHookRegistry_PM_LadderMove *PM_LadderMove() = 0;
 };
 
 struct ReGameFuncs_t {
