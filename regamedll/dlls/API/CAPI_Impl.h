@@ -646,8 +646,8 @@ typedef IHookChainImpl<void, CGameRules **> CReGameHook_FreeGameRules;
 typedef IHookChainRegistryImpl<void, CGameRules **> CReGameHookRegistry_FreeGameRules;
 
 // CBasePlayer::EntSelectSpawnPoint hook
-typedef IHookChainClassImpl<edict_t *, CBasePlayer> CReGameHook_EntSelectSpawnPoint;
-typedef IHookChainRegistryClassImpl<edict_t *, CBasePlayer> CReGameHookRegistry_EntSelectSpawnPoint;
+typedef IHookChainClassImpl<edict_t *, CBasePlayer> CReGameHook_CBasePlayer_EntSelectSpawnPoint;
+typedef IHookChainRegistryClassImpl<edict_t *, CBasePlayer> CReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint;
 
 // ClearMultiDamage hook
 typedef IHookChainImpl<void> CReGameHook_ClearMultiDamage;

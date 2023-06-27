@@ -74,7 +74,7 @@ float GetBaseAccuracy(WeaponIdType id)
 	return 0.0f;
 }
 
-LINK_HOOK_VOID_CHAIN2(ClearMultiDamage);
+LINK_HOOK_VOID_CHAIN2(ClearMultiDamage)
 
 // Resets the global multi damage accumulator
 void EXT_FUNC __API_HOOK(ClearMultiDamage)()
@@ -84,7 +84,7 @@ void EXT_FUNC __API_HOOK(ClearMultiDamage)()
 	gMultiDamage.type = 0;
 }
 
-LINK_HOOK_VOID_CHAIN(ApplyMultiDamage, (entvars_t *pevInflictor, entvars_t *pevAttacker), pevInflictor, pevAttacker);
+LINK_HOOK_VOID_CHAIN(ApplyMultiDamage, (entvars_t *pevInflictor, entvars_t *pevAttacker), pevInflictor, pevAttacker)
 
 // Inflicts contents of global multi damage register on gMultiDamage.pEntity
 void EXT_FUNC __API_HOOK(ApplyMultiDamage)(entvars_t *pevInflictor, entvars_t *pevAttacker)
@@ -96,7 +96,7 @@ void EXT_FUNC __API_HOOK(ApplyMultiDamage)(entvars_t *pevInflictor, entvars_t *p
 
 }
 
-LINK_HOOK_VOID_CHAIN(AddMultiDamage, (entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType), pevInflictor, pEntity, flDamage, bitsDamageType);
+LINK_HOOK_VOID_CHAIN(AddMultiDamage, (entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType), pevInflictor, pEntity, flDamage, bitsDamageType)
 
 void EXT_FUNC __API_HOOK(AddMultiDamage)(entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType)
 {
