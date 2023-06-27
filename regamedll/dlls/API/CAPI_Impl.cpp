@@ -285,6 +285,16 @@ GAMEHOOK_REGISTRY(CBasePlayer_JoiningThink);
 
 GAMEHOOK_REGISTRY(FreeGameRules);
 
+GAMEHOOK_REGISTRY(CBasePlayer_EntSelectSpawnPoint);
+GAMEHOOK_REGISTRY(ClearMultiDamage);
+GAMEHOOK_REGISTRY(AddMultiDamage);
+GAMEHOOK_REGISTRY(ApplyMultiDamage);
+
+GAMEHOOK_REGISTRY(PM_Jump);
+GAMEHOOK_REGISTRY(PM_Duck);
+GAMEHOOK_REGISTRY(PM_CheckWaterJump);
+GAMEHOOK_REGISTRY(PM_LadderMove);
+
 int CReGameApi::GetMajorVersion() {
 	return REGAMEDLL_API_VERSION_MAJOR;
 }
