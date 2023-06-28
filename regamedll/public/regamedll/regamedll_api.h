@@ -524,6 +524,18 @@ typedef IHookChainRegistryClass<void, class CBasePlayer> IReGameHookRegistry_CBa
 typedef IHookChain<void, class CGameRules **> IReGameHook_FreeGameRules;
 typedef IHookChainRegistry<void, class CGameRules **> IReGameHookRegistry_FreeGameRules;
 
+// CHalfLifeMultiplay::TeamFull hook
+typedef IHookChainClass<void, class CHalfLifeMultiplay, int> IReGameHook_CSGameRules_TeamFull;
+typedef IHookChainRegistryClassEmpty<void, class CHalfLifeMultiplay, int> IReGameHookRegistry_CSGameRules_TeamFull;
+
+// CHalfLifeMultiplay::TeamStacked hook
+typedef IHookChainClass<void, class CHalfLifeMultiplay, int, int> IReGameHook_CSGameRules_TeamStacked;
+typedef IHookChainRegistryClassEmpty<void, class CHalfLifeMultiplay, int, int> IReGameHookRegistry_CSGameRules_TeamStacked;
+
+// CHalfLifeMultiplay::PlayerGotWeapon hook
+typedef IHookChainClass<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> IReGameHook_CSGameRules_PlayerGotWeapon;
+typedef IHookChainRegistryClassEmpty<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> IReGameHookRegistry_CSGameRules_PlayerGotWeapon;
+
 // CBasePlayer::EntSelectSpawnPoint hook
 typedef IHookChainClass<edict_t *, CBasePlayer> IReGameHook_CBasePlayer_EntSelectSpawnPoint;
 typedef IHookChainRegistryClass<edict_t *, CBasePlayer> IReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint;
@@ -691,6 +703,10 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_JoiningThink *CBasePlayer_JoiningThink() = 0;
 
 	virtual IReGameHookRegistry_FreeGameRules *FreeGameRules() = 0;
+
+	virtual IReGameHookRegistry_CSGameRules_TeamFull *CSGameRules_TeamFull() = 0;
+	virtual IReGameHookRegistry_CSGameRules_TeamStacked *CSGameRules_TeamStacked() = 0;
+	virtual IReGameHookRegistry_CSGameRules_PlayerGotWeapon *CSGameRules_PlayerGotWeapon() = 0;
 
 	virtual IReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint *CBasePlayer_EntSelectSpawnPoint() = 0;
 

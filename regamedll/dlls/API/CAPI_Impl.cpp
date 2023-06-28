@@ -285,7 +285,12 @@ GAMEHOOK_REGISTRY(CBasePlayer_JoiningThink);
 
 GAMEHOOK_REGISTRY(FreeGameRules);
 
+GAMEHOOK_REGISTRY(CSGameRules_TeamFull);
+GAMEHOOK_REGISTRY(CSGameRules_TeamStacked);
+GAMEHOOK_REGISTRY(CSGameRules_PlayerGotWeapon);
+
 GAMEHOOK_REGISTRY(CBasePlayer_EntSelectSpawnPoint);
+
 GAMEHOOK_REGISTRY(ClearMultiDamage);
 GAMEHOOK_REGISTRY(AddMultiDamage);
 GAMEHOOK_REGISTRY(ApplyMultiDamage);

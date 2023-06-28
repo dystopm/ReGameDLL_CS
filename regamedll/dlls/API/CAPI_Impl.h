@@ -645,6 +645,18 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBase
 typedef IHookChainImpl<void, CGameRules **> CReGameHook_FreeGameRules;
 typedef IHookChainRegistryImpl<void, CGameRules **> CReGameHookRegistry_FreeGameRules;
 
+// CHalfLifeMultiplay::TeamFull hook
+typedef IHookChainClassImpl<void, class CHalfLifeMultiplay, int> CReGameHook_CSGameRules_TeamFull;
+typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay, int> CReGameHookRegistry_CSGameRules_TeamFull;
+
+// CHalfLifeMultiplay::TeamStacked hook
+typedef IHookChainClassImpl<void, class CHalfLifeMultiplay, int, int> CReGameHook_CSGameRules_TeamStacked;
+typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay, int, int> CReGameHookRegistry_CSGameRules_TeamStacked;
+
+// CHalfLifeMultiplay::PlayerGotWeapon hook
+typedef IHookChainClassImpl<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> CReGameHook_CSGameRules_PlayerGotWeapon;
+typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> CReGameHookRegistry_CSGameRules_PlayerGotWeapon;
+
 // CBasePlayer::EntSelectSpawnPoint hook
 typedef IHookChainClassImpl<edict_t *, CBasePlayer> CReGameHook_CBasePlayer_EntSelectSpawnPoint;
 typedef IHookChainRegistryClassImpl<edict_t *, CBasePlayer> CReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint;
@@ -812,6 +824,10 @@ public:
 
 	CReGameHookRegistry_FreeGameRules m_FreeGameRules;
 
+	CReGameHookRegistry_CSGameRules_TeamFull m_CSGameRules_TeamFull;
+	CReGameHookRegistry_CSGameRules_TeamStacked m_CSGameRules_TeamStacked;
+	CReGameHookRegistry_CSGameRules_PlayerGotWeapon m_CSGameRules_PlayerGotWeapon;
+
 	CReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint m_CBasePlayer_EntSelectSpawnPoint;
 
 	CReGameHookRegistry_ClearMultiDamage m_ClearMultiDamage;
@@ -955,6 +971,10 @@ public:
 	virtual IReGameHookRegistry_CBasePlayer_JoiningThink *CBasePlayer_JoiningThink();
 
 	virtual IReGameHookRegistry_FreeGameRules *FreeGameRules();
+
+	virtual IReGameHookRegistry_CSGameRules_TeamFull *CSGameRules_TeamFull();
+	virtual IReGameHookRegistry_CSGameRules_TeamStacked *CSGameRules_TeamStacked();
+	virtual IReGameHookRegistry_CSGameRules_PlayerGotWeapon *CSGameRules_PlayerGotWeapon();
 
 	virtual IReGameHookRegistry_CBasePlayer_EntSelectSpawnPoint *CBasePlayer_EntSelectSpawnPoint();
 
