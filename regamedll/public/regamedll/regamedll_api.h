@@ -525,16 +525,16 @@ typedef IHookChain<void, class CGameRules **> IReGameHook_FreeGameRules;
 typedef IHookChainRegistry<void, class CGameRules **> IReGameHookRegistry_FreeGameRules;
 
 // CHalfLifeMultiplay::TeamFull hook
-typedef IHookChainClass<void, class CHalfLifeMultiplay, int> IReGameHook_CSGameRules_TeamFull;
-typedef IHookChainRegistryClassEmpty<void, class CHalfLifeMultiplay, int> IReGameHookRegistry_CSGameRules_TeamFull;
+typedef IHookChain<void, int> IReGameHook_CSGameRules_TeamFull;
+typedef IHookChainRegistry<void, class CHalfLifeMultiplay, int> IReGameHookRegistry_CSGameRules_TeamFull;
 
 // CHalfLifeMultiplay::TeamStacked hook
-typedef IHookChainClass<void, class CHalfLifeMultiplay, int, int> IReGameHook_CSGameRules_TeamStacked;
-typedef IHookChainRegistryClassEmpty<void, class CHalfLifeMultiplay, int, int> IReGameHookRegistry_CSGameRules_TeamStacked;
+typedef IHookChain<void, int, int> IReGameHook_CSGameRules_TeamStacked;
+typedef IHookChainRegistry<void, class CHalfLifeMultiplay, int, int> IReGameHookRegistry_CSGameRules_TeamStacked;
 
 // CHalfLifeMultiplay::PlayerGotWeapon hook
-typedef IHookChainClass<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> IReGameHook_CSGameRules_PlayerGotWeapon;
-typedef IHookChainRegistryClassEmpty<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> IReGameHookRegistry_CSGameRules_PlayerGotWeapon;
+typedef IHookChain<void, CBasePlayer *, CBasePlayerItem *> IReGameHook_CSGameRules_PlayerGotWeapon;
+typedef IHookChainRegistry<void, CBasePlayer *, CBasePlayerItem *> IReGameHookRegistry_CSGameRules_PlayerGotWeapon;
 
 // CBasePlayer::EntSelectSpawnPoint hook
 typedef IHookChainClass<edict_t *, CBasePlayer> IReGameHook_CBasePlayer_EntSelectSpawnPoint;
