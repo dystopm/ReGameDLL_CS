@@ -526,11 +526,11 @@ typedef IHookChainRegistry<void, class CGameRules **> IReGameHookRegistry_FreeGa
 
 // CHalfLifeMultiplay::TeamFull hook
 typedef IHookChain<BOOL, int> IReGameHook_CSGameRules_TeamFull;
-typedef IHookChainRegistry<void, class CHalfLifeMultiplay, int> IReGameHookRegistry_CSGameRules_TeamFull;
+typedef IHookChainRegistry<BOOL, int> IReGameHookRegistry_CSGameRules_TeamFull;
 
 // CHalfLifeMultiplay::TeamStacked hook
 typedef IHookChain<BOOL, int, int> IReGameHook_CSGameRules_TeamStacked;
-typedef IHookChainRegistry<void, class CHalfLifeMultiplay, int, int> IReGameHookRegistry_CSGameRules_TeamStacked;
+typedef IHookChainRegistry<BOOL, int, int> IReGameHookRegistry_CSGameRules_TeamStacked;
 
 // CHalfLifeMultiplay::PlayerGotWeapon hook
 typedef IHookChain<void, CBasePlayer *, CBasePlayerItem *> IReGameHook_CSGameRules_PlayerGotWeapon;
