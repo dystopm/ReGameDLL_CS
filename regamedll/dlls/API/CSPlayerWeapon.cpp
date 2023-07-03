@@ -26,31 +26,14 @@
 *
 */
 
-#pragma once
+#include "precompiled.h"
 
-class CBasePlayerWeapon;
-class CCSPlayerWeapon: public CCSPlayerItem
+EXT_FUNC BOOL CCSPlayerWeapon::DefaultDeploy(char *szViewModel, char *szWeaponModel, int iAnim, char *szAnimExt, int skiplocal)
 {
-public:
-	CCSPlayerWeapon() :
-		m_bHasSecondaryAttack(false),
-		m_bBlockSecondaryAttack(false)
-	{
-	}
+	return BasePlayerWeapon()->DefaultDeploy(szViewModel, szWeaponModel, iAnim, szAnimExt, skiplocal);
+}
 
-	virtual BOOL DefaultDeploy(char *szViewModel, char *szWeaponModel, int iAnim, char *szAnimExt, int skiplocal = 0);
-	virtual int DefaultReload(int iClipSize, int iAnim, float fDelay);
-
-	CBasePlayerWeapon *BasePlayerWeapon() const;
-
-public:
-	bool m_bHasSecondaryAttack;
-	float m_flBaseDamage;
-	bool m_bBlockSecondaryAttack;
-};
-
-// Inlines
-inline CBasePlayerWeapon *CCSPlayerWeapon::BasePlayerWeapon() const
+EXT_FUNC int CCSPlayerWeapon::DefaultReload(int iClipSize, int iAnim, float fDelay)
 {
-	return reinterpret_cast<CBasePlayerWeapon *>(this->m_pContainingEntity);
+	return BasePlayerWeapon()->DefaultReload(iClipSize, iAnim, fDelay);
 }
