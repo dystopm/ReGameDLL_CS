@@ -1906,9 +1906,18 @@ void PM_Duck_internal()
 		return;
 	}
 
-	pmove->cmd.forwardmove *= PLAYER_DUCKING_MULTIPLIER;
-	pmove->cmd.sidemove *= PLAYER_DUCKING_MULTIPLIER;
-	pmove->cmd.upmove *= PLAYER_DUCKING_MULTIPLIER;
+	float mult = PLAYER_DUCKING_MULTIPLIER;
+
+#ifdef REGAMEDLL_API
+	const CCSPlayer* player = UTIL_PlayerByIndex(pmove->player_index + 1)->CSPlayer();
+
+	if (player->m_flDuckSpeedMultiplier > 0.0)
+		mult = player->m_flDuckSpeedMultiplier;
+#endif
+
+	pmove->cmd.forwardmove *= mult;
+	pmove->cmd.sidemove *= mult;
+	pmove->cmd.upmove *= mult;
 
 	if (pmove->cmd.buttons & IN_DUCK)
 	{
@@ -2027,7 +2036,16 @@ void PM_LadderMove_internal(physent_t *pLadder)
 
 		if (pmove->flags & FL_DUCKING)
 		{
-			flSpeed *= PLAYER_DUCKING_MULTIPLIER;
+			float mult = PLAYER_DUCKING_MULTIPLIER;
+
+#ifdef REGAMEDLL_API
+			const CCSPlayer* player = UTIL_PlayerByIndex(pmove->player_index + 1)->CSPlayer();
+
+			if (player->m_flDuckSpeedMultiplier > 0.0)
+				mult = player->m_flDuckSpeedMultiplier;
+#endif
+
+			flSpeed *= mult;
 		}
 
 		if (pmove->cmd.buttons & IN_BACK)
@@ -2492,12 +2510,12 @@ void PM_Jump_internal()
 #endif
 	{
 #ifdef REGAMEDLL_API
-		if(longjump)
+		if (longjump)
 		{
 			if(player->m_flLongJumpHeight > 0.0)
 				return player->m_flLongJumpHeight;
 		}
-		else if(player->m_flJumpHeight > 0.0)
+		else if (player->m_flJumpHeight > 0.0)
 			return player->m_flJumpHeight;
 #endif
 		return Q_sqrt(2.0 * 800.0f * (longjump ? 56.0f : 45.0f));
@@ -2518,14 +2536,19 @@ void PM_Jump_internal()
 			pmove->punchangle[0] = -5.0f;
 
 #ifdef REGAMEDLL_API
-			if(player->m_flLongJumpForce > 0.0)
+			if (player->m_flLongJumpForce > 0.0)
 			{
-				VectorScale(pmove->forward, player->m_flLongJumpForce, pmove->velocity);
+				fvel = player->m_flLongJumpForce;
 			}
 			else
 #endif
 			{
-				VectorScale(pmove->forward, PLAYER_LONGJUMP_SPEED * 1.6f, pmove->velocity);
+				fvel = PLAYER_LONGJUMP_SPEED * 1.6f;
+			}
+
+			for (int i = 0; i < 2; i++)
+			{
+				pmove->velocity[i] = pmove->forward[i] * fvel;
 			}
 
 			pmove->velocity[2] = PM_JumpHeight(true);
