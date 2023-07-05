@@ -37,3 +37,13 @@ EXT_FUNC int CCSPlayerWeapon::DefaultReload(int iClipSize, int iAnim, float fDel
 {
 	return BasePlayerWeapon()->DefaultReload(iClipSize, iAnim, fDelay);
 }
+
+EXT_FUNC bool CCSPlayerWeapon::DefaultShotgunReload(int iAnim, int iStartAnim, float fDelay, float fStartDelay, const char *pszReloadSound1 = nullptr, const char *pszReloadSound2 = nullptr)
+{
+	return BasePlayerWeapon()->DefaultShotgunReload(iAnim, iStartAnim, fDelay, fStartDelay, pszReloadSound1, pszReloadSound2);
+}
+
+EXT_FUNC void CCSPlayerWeapon::KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max, float lateral_max, int direction_change)
+{
+	BasePlayerWeapon()->KickBack(up_base, lateral_base, up_modifier, lateral_modifier, up_max, lateral_max, direction_change);
+}

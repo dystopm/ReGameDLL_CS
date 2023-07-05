@@ -40,6 +40,9 @@ public:
 
 	virtual BOOL DefaultDeploy(char *szViewModel, char *szWeaponModel, int iAnim, char *szAnimExt, int skiplocal = 0);
 	virtual int DefaultReload(int iClipSize, int iAnim, float fDelay);
+	virtual bool DefaultShotgunReload(int iAnim, int iStartAnim, float fDelay, float fStartDelay, const char *pszReloadSound1 = nullptr, const char *pszReloadSound2 = nullptr);
+	virtual void KickBack(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max, float lateral_max, int direction_change);
+
 
 	CBasePlayerWeapon *BasePlayerWeapon() const;
 
