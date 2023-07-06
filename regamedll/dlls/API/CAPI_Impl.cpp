@@ -114,6 +114,23 @@ EXT_FUNC CWeaponBox *CreateWeaponBox_api(CBasePlayerItem *pItem, CBasePlayer *pP
 	return CreateWeaponBox(pItem, pPlayerOwner, modelName, origin, angles, velocity, lifeTime < 0.0 ? CGameRules::GetItemKillDelay() : lifeTime, packAmmo);
 }
 
+EXT_FUNC CGrenade *SpawnGrenade_api(WeaponIdType weaponId, entvars_t *pevOwner, Vector &vecSrc, Vector &vecThrow, float time, int iTeam, unsigned short usEvent)
+{
+	switch (weaponId)
+	{
+		case WEAPON_HEGRENADE:    
+			return CGrenade::ShootTimed2(pevOwner, vecSrc, vecThrow, time, iTeam, usEvent);
+		case WEAPON_FLASHBANG:    
+			return CGrenade::ShootTimed(pevOwner, vecSrc, vecThrow, time);
+		case WEAPON_SMOKEGRENADE: 
+			return CGrenade::ShootSmokeGrenade(pevOwner, vecSrc, vecThrow, time, usEvent);
+		case WEAPON_C4:
+			return CGrenade::ShootSatchelCharge(pevOwner, vecSrc, vecThrow);
+	}
+
+	return nullptr;
+}
+
 EXT_FUNC void TextureTypePlaySound_api(TraceResult *ptr, Vector vecSrc, Vector vecEnd, int iBulletType)
 {
 	TEXTURETYPE_PlaySound(ptr, vecSrc, vecEnd, iBulletType);
@@ -150,6 +167,7 @@ ReGameFuncs_t g_ReGameApiFuncs = {
 
 	AddAmmoNameToAmmoRegistry_api,
 	CreateWeaponBox_api,
+	SpawnGrenade_api,
 	TextureTypePlaySound_api,
 };
 
