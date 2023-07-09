@@ -5171,6 +5171,9 @@ void CHalfLifeMultiplay::ChangePlayerTeam(CBasePlayer *pPlayer, const char *pTea
 
 			// have the player kill themself
 			pPlayer->pev->health = 0;
+#ifdef REGAMEDLL_FIXES
+			pPlayer->pev->dmg_inflictor = nullptr;
+#endif
 			pPlayer->Killed(pPlayer->pev, bGib ? GIB_ALWAYS : GIB_NEVER);
 
 			// add 1 to frags to balance out the 1 subtracted for killing yourself
