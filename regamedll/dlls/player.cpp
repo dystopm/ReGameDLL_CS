@@ -2109,8 +2109,27 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 			}
 
 			TheCareerTasks->HandleDeath(m_iTeam, this);
+
+#ifdef REGAMEDLL_FIXES
+			if (!m_bKilledByBomb)
+			{
+				CBasePlayer *pAttacker = CBasePlayer::Instance(pevAttacker);
+
+				if(pAttacker /*safety*/ && !pAttacker->IsBot() && pAttacker->m_iTeam != m_iTeam)
+				{
+					if (pAttacker->HasShield())
+						killerHasShield = true;
+
+					if (IsBot() && IsBlind()) // dystopm: shouldn't be !IsBot() ?
+						wasBlind = true;
+
+					TheCareerTasks->HandleEnemyKill(wasBlind, GetWeaponName(g_pevLastInflictor, pevAttacker), m_bHeadshotKilled, killerHasShield, pAttacker, this); // last 2 param swapped to match function definition
+				}
+			}
+#endif
 		}
 
+#ifndef REGAMEDLL_FIXES
 		if (!m_bKilledByBomb)
 		{
 			CBasePlayer *pAttacker = CBasePlayer::Instance(pevAttacker);
@@ -2146,6 +2165,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 				}
 			}
 		}
+#endif
 	}
 
 	if (!m_bKilledByBomb)
@@ -6593,7 +6613,7 @@ void CBasePlayer::CheatImpulseCommands(int iImpulse)
 			TraceResult tr;
 			Vector dir(0, 0, 1);
 
-			UTIL_BloodDrips(pev->origin, dir, BLOOD_COLOR_RED, 2000);
+			UTIL_BloodDrips(pev->origin, BLOOD_COLOR_RED, 2000);
 
 			for (int r = 1; r < 4; r++)
 			{
