@@ -194,9 +194,10 @@ void CAWP::AWPFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CAWP::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_338mag <= 0)
 		return;
-
+#endif
 	if (DefaultReload(iMaxClip(), AWP_RELOAD, AWP_RELOAD_TIME))
 	{
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);

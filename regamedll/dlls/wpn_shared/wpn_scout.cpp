@@ -186,7 +186,7 @@ void CSCOUT::SCOUTFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CSCOUT::Reload()
 {
-#ifdef REGAMEDLL_FIXES
+#ifndef REGAMEDLL_FIXES
 	// to prevent reload if not enough ammo
 	if (m_pPlayer->ammo_762nato <= 0)
 		return;

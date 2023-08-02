@@ -170,7 +170,7 @@ void CM249::M249Fire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CM249::Reload()
 {
-#ifdef REGAMEDLL_FIXES
+#ifndef REGAMEDLL_FIXES
 	// to prevent reload if not enough ammo
 	if (m_pPlayer->ammo_556natobox <= 0)
 		return;

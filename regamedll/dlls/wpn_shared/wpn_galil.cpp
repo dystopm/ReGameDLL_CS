@@ -176,7 +176,7 @@ void CGalil::GalilFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CGalil::Reload()
 {
-#ifdef REGAMEDLL_FIXES
+#ifndef REGAMEDLL_FIXES
 	// to prevent reload if not enough ammo
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;

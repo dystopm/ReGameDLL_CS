@@ -181,9 +181,10 @@ void CAUG::AUGFire(float flSpread, float flCycleTime, BOOL fUseAutoAim)
 
 void CAUG::Reload()
 {
+#ifndef REGAMEDLL_FIXES
 	if (m_pPlayer->ammo_556nato <= 0)
 		return;
-
+#endif
 	if (DefaultReload(iMaxClip(), AUG_RELOAD, AUG_RELOAD_TIME))
 	{
 		m_pPlayer->SetAnimation(PLAYER_RELOAD);
