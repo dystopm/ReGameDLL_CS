@@ -437,7 +437,12 @@ BOOL CBaseMonster::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, f
 		{
 			pev->dmg_inflictor = ENT(pevInflictor);
 		}
-
+#ifdef REGAMEDLL_FIXES
+		else
+		{
+			pev->dmg_inflictor = nullptr;
+		}
+#endif
 		pev->dmg_take += flTake;
 	}
 
