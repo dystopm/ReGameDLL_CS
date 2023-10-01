@@ -1044,7 +1044,7 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 
 	pAttacker = GetClassPtr<CCSEntity>((CBaseEntity *)pevAttacker);
 
-	if (pAttacker->IsPlayer())
+	if (pAttacker->IsPlayer() && !(pAttacker == this && (bitsDamageType & DMG_FALL)))
 	{
 		pAttack = GetClassPtr<CCSPlayer>((CBasePlayer *)pevAttacker);
 
@@ -1086,16 +1086,18 @@ BOOL EXT_FUNC CBasePlayer::__API_HOOK(TakeDamage)(entvars_t *pevInflictor, entva
 
 					pAttack->m_flLastAttackedTeammate = gpGlobals->time;
 				}
-			}
 
 #ifdef REGAMEDLL_ADD
-			// bullets hurt teammates less
-			flDamage *= clamp(((bitsDamageType & DMG_BULLET) ?
-				ff_damage_reduction_bullets.value :
-				ff_damage_reduction_other.value), 0.0f, 1.0f);
-#else
-			flDamage *= 0.35;
+				// bullets hurt teammates less
+				flDamage *= clamp(((bitsDamageType & DMG_BULLET) ?
+					ff_damage_reduction_bullets.value :
+					ff_damage_reduction_other.value), 0.0f, 1.0f);
 #endif // #ifdef REGAMEDLL_ADD
+			}
+
+#ifndef REGAMEDLL_ADD
+			flDamage *= 0.35;
+#endif
 		}
 
 		if (pAttack->m_pActiveItem)
@@ -7370,7 +7372,10 @@ void EXT_FUNC CBasePlayer::__API_HOOK(UpdateClientData)()
 
 			if (pEntity)
 			{
-				damageOrigin = pEntity->Center();
+				if (pEntity == this && (m_bitsDamageType & DMG_FALL))
+					damageOrigin = Vector(0, 0, 0); // do not show direction of damage caused by fall
+				else
+					damageOrigin = pEntity->Center();
 			}
 		}
 
