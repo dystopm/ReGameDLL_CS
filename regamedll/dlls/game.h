@@ -186,6 +186,7 @@ extern cvar_t t_give_player_knife;
 extern cvar_t t_default_weapons_secondary;
 extern cvar_t t_default_weapons_primary;
 extern cvar_t free_armor;
+extern cvar_t teamflash;
 extern cvar_t allchat;
 extern cvar_t sv_autobunnyhopping;
 extern cvar_t sv_enablebunnyhopping;
@@ -194,6 +195,8 @@ extern cvar_t give_c4_frags;
 extern cvar_t hostages_rescued_ratio;
 extern cvar_t legacy_vehicle_block;
 extern cvar_t dying_time;
+extern cvar_t deathmsg_flags;
+extern cvar_t assist_damage_threshold;
 
 #endif
 

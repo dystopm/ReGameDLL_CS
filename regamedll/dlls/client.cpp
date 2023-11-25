@@ -621,6 +621,9 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 		return;
 	}
 
+#ifdef REGAMEDLL_FIXES
+	pPlayer->m_bHasDefuser = false;
+#endif
 	pPlayer->m_bNotKilled = true;
 	pPlayer->m_iIgnoreGlobalChat = IGNOREMSG_NONE;
 	pPlayer->m_iTeamKills = 0;
@@ -727,7 +730,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	}
 
 #ifdef REGAMEDLL_API
-	pPlayer->CSPlayer()->ResetVars();
+	pPlayer->CSPlayer()->OnConnect();
 #endif
 
 	UTIL_ClientPrintAll(HUD_PRINTNOTIFY, "#Game_connected", (sName[0] != '\0') ? sName : "<unconnected>");
@@ -1437,28 +1440,13 @@ void EXT_FUNC __API_HOOK(BuyItem)(CBasePlayer *pPlayer, int iSlot)
 			if (pPlayer->m_iAccount >= DEFUSEKIT_PRICE)
 			{
 				bEnoughMoney = true;
-				pPlayer->m_bHasDefuser = true;
-
-				MESSAGE_BEGIN(MSG_ONE, gmsgStatusIcon, nullptr, pPlayer->pev);
-					WRITE_BYTE(STATUSICON_SHOW);
-					WRITE_STRING("defuser");
-					WRITE_BYTE(0);
-					WRITE_BYTE(160);
-					WRITE_BYTE(0);
-				MESSAGE_END();
-
-				pPlayer->pev->body = 1;
+				pPlayer->GiveDefuser();
 				pPlayer->AddAccount(-DEFUSEKIT_PRICE, RT_PLAYER_BOUGHT_SOMETHING);
 
 #ifdef REGAMEDLL_FIXES
 				EMIT_SOUND(ENT(pPlayer->pev), CHAN_VOICE, "items/kevlar.wav", VOL_NORM, ATTN_NORM);
 #else
 				EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/kevlar.wav", VOL_NORM, ATTN_NORM);
-#endif
-				pPlayer->SendItemStatus();
-
-#ifdef BUILD_LATEST
-				pPlayer->SetScoreboardAttributes();
 #endif
 			}
 			break;
@@ -1476,7 +1464,6 @@ void EXT_FUNC __API_HOOK(BuyItem)(CBasePlayer *pPlayer, int iSlot)
 			if (pPlayer->m_iAccount >= SHIELDGUN_PRICE)
 			{
 				bEnoughMoney = true;
-
 				pPlayer->DropPrimary();
 				pPlayer->GiveShield();
 				pPlayer->AddAccount(-SHIELDGUN_PRICE, RT_PLAYER_BOUGHT_SOMETHING);
@@ -2264,7 +2251,7 @@ bool EXT_FUNC __API_HOOK(BuyGunAmmo)(CBasePlayer *pPlayer, CBasePlayerItem *weap
 	if (pPlayer->m_iAccount >= info->clipCost)
 	{
 #ifdef REGAMEDLL_FIXES
-		if (pPlayer->GiveAmmo(info->buyClipSize, info->ammoName2, weapon->iMaxAmmo1()) == -1)
+		if (pPlayer->GiveAmmo(info->buyClipSize, weapon->pszAmmo1(), weapon->iMaxAmmo1()) == -1)
 			return false;
 
 		EMIT_SOUND(ENT(weapon->pev), CHAN_ITEM, "items/9mmclip1.wav", VOL_NORM, ATTN_NORM);
@@ -4819,6 +4806,16 @@ int EXT_FUNC GetWeaponData(edict_t *pEdict, struct weapon_data_s *info)
 					item->fuser2 = weapon->m_flStartThrow;
 					item->fuser3 = weapon->m_flReleaseThrow;
 					item->iuser1 = weapon->m_iSwing;
+
+#ifdef REGAMEDLL_FIXES
+					if (pPlayerItem == pPlayer->m_pActiveItem && !weapon->m_fInReload && weapon->m_iClip == II.iMaxClip)
+					{
+						const WeaponInfoStruct *wpnInfo = GetDefaultWeaponInfo(II.iId);
+
+						if (wpnInfo && wpnInfo->gunClipSize != II.iMaxClip)
+							item->m_iClip = wpnInfo->gunClipSize;
+					}
+#endif
 				}
 			}
 

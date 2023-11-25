@@ -220,6 +220,41 @@ enum
 	GR_NEUTRAL,
 };
 
+// The number of times you must kill a given player to be dominating them
+// Should always be more than 1
+const int CS_KILLS_FOR_DOMINATION = 4;
+
+// Flags for specifying extra info about player death
+enum DeathMessageFlags
+{
+	// float[3]
+	// Position where the victim was killed by the enemy
+	PLAYERDEATH_POSITION          = 0x001,
+
+	// byte
+	// Index of the assistant who helped the attacker kill the victim
+	PLAYERDEATH_ASSISTANT         = 0x002,
+
+	// short
+	// Bitsum classification for the rarity of the kill
+	// See enum KillRarity for details
+	PLAYERDEATH_KILLRARITY        = 0x004
+};
+
+// Classifying various player kill methods in the game
+enum KillRarity
+{
+	KILLRARITY_HEADSHOT         = 0x001, // Headshot
+	KILLRARITY_KILLER_BLIND     = 0x002, // Killer was blind
+	KILLRARITY_NOSCOPE          = 0x004, // No-scope sniper rifle kill
+	KILLRARITY_PENETRATED       = 0x008, // Penetrated kill (through walls)
+	KILLRARITY_THRUSMOKE        = 0x010, // Smoke grenade penetration kill (bullets went through smoke)
+	KILLRARITY_ASSISTEDFLASH    = 0x020, // Assister helped with a flash
+	KILLRARITY_DOMINATION_BEGAN = 0x040, // Killer player began dominating the victim (NOTE: this flag is set once)
+	KILLRARITY_DOMINATION       = 0x080, // Continues domination by the killer
+	KILLRARITY_REVENGE          = 0x100  // Revenge by the killer
+};
+
 class CItem;
 
 class CGameRules
@@ -543,7 +578,7 @@ public:
 	// check if the scenario has been won/lost
 	virtual void CheckWinConditions();
 	virtual void RemoveGuns();
-	virtual void GiveC4();
+	virtual CBasePlayer *GiveC4();
 	virtual void ChangeLevel();
 	virtual void GoToIntermission();
 
@@ -566,7 +601,7 @@ public:
 	void RestartRound_OrigFunc();
 	void CheckWinConditions_OrigFunc();
 	void RemoveGuns_OrigFunc();
-	void GiveC4_OrigFunc();
+	CBasePlayer *GiveC4_OrigFunc();
 	void ChangeLevel_OrigFunc();
 	void GoToIntermission_OrigFunc();
 	void BalanceTeams_OrigFunc();
@@ -574,6 +609,7 @@ public:
 	BOOL TeamFull_OrigFunc(int team_id);
 	BOOL TeamStacked_OrigFunc(int newTeam_id, int curTeam_id);
 	void PlayerGotWeapon_OrigFunc(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon);
+	void SendDeathMessage_OrigFunc(CBaseEntity *pKiller, CBasePlayer *pVictim, CBasePlayer *pAssister, entvars_t *pevInflictor, const char *killerWeaponName, int iDeathMessageFlags, int iRarityOfKill);
 #endif
 
 public:
@@ -697,6 +733,10 @@ public:
 
 	VFUNC bool HasRoundTimeExpired();
 	VFUNC bool IsBombPlanted();
+
+	void SendDeathMessage(CBaseEntity *pKiller, CBasePlayer *pVictim, CBasePlayer *pAssister, entvars_t *pevInflictor, const char *killerWeaponName, int iDeathMessageFlags, int iRarityOfKill);
+	int GetRarityOfKill(CBaseEntity *pKiller, CBasePlayer *pVictim, CBasePlayer *pAssister, const char *killerWeaponName, bool bFlashAssist);
+	CBasePlayer *CheckAssistsToKill(CBaseEntity *pKiller, CBasePlayer *pVictim, bool &bFlashAssist);
 
 private:
 	void MarkLivingPlayersOnTeamAsNotReceivingMoneyNextRound(int iTeam);

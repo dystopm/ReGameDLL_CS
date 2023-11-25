@@ -160,11 +160,14 @@ cvar_t t_give_player_knife               = { "mp_t_give_player_knife", "1", 0, 1
 cvar_t t_default_weapons_secondary       = { "mp_t_default_weapons_secondary", "glock18", 0, 0.0f, nullptr };
 cvar_t t_default_weapons_primary         = { "mp_t_default_weapons_primary", "", 0, 0.0f, nullptr };
 cvar_t free_armor                        = { "mp_free_armor", "0", 0, 0.0f, nullptr };
+cvar_t teamflash                         = { "mp_team_flash", "1", 0, 1.0f, nullptr };
 cvar_t allchat                           = { "sv_allchat", "0", 0, 0.0f, nullptr };
 cvar_t sv_autobunnyhopping               = { "sv_autobunnyhopping", "0", 0, 0.0f, nullptr };
 cvar_t sv_enablebunnyhopping             = { "sv_enablebunnyhopping", "0", 0, 0.0f, nullptr };
 cvar_t plant_c4_anywhere                 = { "mp_plant_c4_anywhere", "0", 0, 0.0f, nullptr };
 cvar_t give_c4_frags                     = { "mp_give_c4_frags", "3", 0, 3.0f, nullptr };
+cvar_t deathmsg_flags                    = { "mp_deathmsg_flags", "abc", 0, 0.0f, nullptr };
+cvar_t assist_damage_threshold           = { "mp_assist_damage_threshold", "40", 0, 40.0f, nullptr };
 
 cvar_t hostages_rescued_ratio = { "mp_hostages_rescued_ratio", "1.0", 0, 1.0f, nullptr };
 
@@ -410,6 +413,7 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&t_default_weapons_secondary);
 	CVAR_REGISTER(&t_default_weapons_primary);
 	CVAR_REGISTER(&free_armor);
+	CVAR_REGISTER(&teamflash);
 	CVAR_REGISTER(&allchat);
 	CVAR_REGISTER(&sv_autobunnyhopping);
 	CVAR_REGISTER(&sv_enablebunnyhopping);
@@ -421,6 +425,8 @@ void EXT_FUNC GameDLLInit()
 	CVAR_REGISTER(&legacy_vehicle_block);
 
 	CVAR_REGISTER(&dying_time);
+	CVAR_REGISTER(&deathmsg_flags);
+	CVAR_REGISTER(&assist_damage_threshold);
 
 	// print version
 	CONSOLE_ECHO("ReGameDLL version: " APP_VERSION "\n");

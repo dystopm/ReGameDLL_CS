@@ -458,8 +458,8 @@ typedef IHookChainClassImpl<void, class CHalfLifeMultiplay> CReGameHook_CSGameRu
 typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_RemoveGuns;
 
 // CHalfLifeMultiplay::GiveC4 hook
-typedef IHookChainClassImpl<void, class CHalfLifeMultiplay> CReGameHook_CSGameRules_GiveC4;
-typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_GiveC4;
+typedef IHookChainClassImpl<CBasePlayer *, class CHalfLifeMultiplay> CReGameHook_CSGameRules_GiveC4;
+typedef IHookChainRegistryClassEmptyImpl<CBasePlayer *, class CHalfLifeMultiplay> CReGameHookRegistry_CSGameRules_GiveC4;
 
 // CHalfLifeMultiplay::ChangeLevel hook
 typedef IHookChainClassImpl<void, class CHalfLifeMultiplay> CReGameHook_CSGameRules_ChangeLevel;
@@ -709,6 +709,10 @@ typedef IHookChainRegistryClassEmptyImpl<BOOL, class CHalfLifeMultiplay, int, in
 typedef IHookChainClassImpl<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> CReGameHook_CSGameRules_PlayerGotWeapon;
 typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay, CBasePlayer *, CBasePlayerItem *> CReGameHookRegistry_CSGameRules_PlayerGotWeapon;
 
+// CHalfLifeMultiplay::SendDeathMessage hook
+typedef IHookChainClassImpl<void, class CHalfLifeMultiplay, CBaseEntity *, CBasePlayer *, CBasePlayer *, entvars_t *, const char *, int, int> CReGameHook_CSGameRules_SendDeathMessage;
+typedef IHookChainRegistryClassEmptyImpl<void, class CHalfLifeMultiplay, CBaseEntity *, CBasePlayer *, CBasePlayer *, entvars_t *, const char *, int, int> CReGameHookRegistry_CSGameRules_SendDeathMessage;
+
 // CBotManager::OnEvent hook
 typedef IHookChainClassImpl<void, CBotManager, GameEventType, CBaseEntity *, CBaseEntity *> CReGameHook_CBotManager_OnEvent;
 typedef IHookChainRegistryClassEmptyImpl<void, CBotManager, GameEventType, CBaseEntity*, CBaseEntity*> CReGameHookRegistry_CBotManager_OnEvent;
@@ -732,6 +736,10 @@ typedef IHookChainRegistryClassImpl<void, CBasePlayerWeapon, float, float, float
 // CBasePlayerWeapon::SendWeaponAnim hook
 typedef IHookChainClassImpl<void, CBasePlayerWeapon, int, int> CReGameHook_CBasePlayerWeapon_SendWeaponAnim;
 typedef IHookChainRegistryClassImpl<void, CBasePlayerWeapon, int, int> CReGameHookRegistry_CBasePlayerWeapon_SendWeaponAnim;
+
+// CBasePlayer::PlayerDeathThink hook
+typedef IHookChainClassImpl<void, CBasePlayer> CReGameHook_CBasePlayer_PlayerDeathThink;
+typedef IHookChainRegistryClassImpl<void, CBasePlayer> CReGameHookRegistry_CBasePlayer_PlayerDeathThink;
 
 class CReGameHookchains: public IReGameHookchains {
 public:
@@ -865,7 +873,6 @@ public:
 	CReGameHookRegistry_CBasePlayer_Pain m_CBasePlayer_Pain;
 	CReGameHookRegistry_CBasePlayer_DeathSound m_CBasePlayer_DeathSound;
 	CReGameHookRegistry_CBasePlayer_JoiningThink m_CBasePlayer_JoiningThink;
-	
 	CReGameHookRegistry_FreeGameRules m_FreeGameRules;
 	CReGameHookRegistry_PM_LadderMove m_PM_LadderMove;
 	CReGameHookRegistry_PM_WaterJump m_PM_WaterJump;
@@ -889,6 +896,9 @@ public:
 	CReGameHookRegistry_CBasePlayerWeapon_ItemPostFrame m_CBasePlayerWeapon_ItemPostFrame;
 	CReGameHookRegistry_CBasePlayerWeapon_KickBack m_CBasePlayerWeapon_KickBack;
 	CReGameHookRegistry_CBasePlayerWeapon_SendWeaponAnim m_CBasePlayerWeapon_SendWeaponAnim;
+	CReGameHookRegistry_CSGameRules_SendDeathMessage m_CSGameRules_SendDeathMessage;
+
+	CReGameHookRegistry_CBasePlayer_PlayerDeathThink m_CBasePlayer_PlayerDeathThink;
 
 public:
 	virtual IReGameHookRegistry_CBasePlayer_Spawn *CBasePlayer_Spawn();
@@ -1044,6 +1054,9 @@ public:
 	virtual IReGameHookRegistry_CBasePlayerWeapon_ItemPostFrame *CBasePlayerWeapon_ItemPostFrame();
 	virtual IReGameHookRegistry_CBasePlayerWeapon_KickBack *CBasePlayerWeapon_KickBack();
 	virtual IReGameHookRegistry_CBasePlayerWeapon_SendWeaponAnim *CBasePlayerWeapon_SendWeaponAnim();
+	virtual IReGameHookRegistry_CSGameRules_SendDeathMessage *CSGameRules_SendDeathMessage();
+
+	virtual IReGameHookRegistry_CBasePlayer_PlayerDeathThink *CBasePlayer_PlayerDeathThink();
 };
 
 extern CReGameHookchains g_ReGameHookchains;

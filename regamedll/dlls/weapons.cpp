@@ -93,7 +93,7 @@ void EXT_FUNC __API_HOOK(ApplyMultiDamage)(entvars_t *pevInflictor, entvars_t *p
 		return;
 
 	gMultiDamage.pEntity->TakeDamage(pevInflictor, pevAttacker, gMultiDamage.amount, gMultiDamage.type);
-
+	gMultiDamage.pEntity->ResetDmgPenetrationLevel();
 }
 
 LINK_HOOK_VOID_CHAIN(AddMultiDamage, (entvars_t *pevInflictor, CBaseEntity *pEntity, float flDamage, int bitsDamageType), pevInflictor, pEntity, flDamage, bitsDamageType)
@@ -1128,8 +1128,10 @@ void EXT_FUNC CBasePlayerWeapon::__API_HOOK(ItemPostFrame)()
 	}
 }
 
-void CBasePlayerItem::DestroyItem()
+bool CBasePlayerItem::DestroyItem()
 {
+	bool success = false;
+
 	if (m_pPlayer)
 	{
 		// if attached to a player, remove.
@@ -1137,18 +1139,31 @@ void CBasePlayerItem::DestroyItem()
 		{
 
 #ifdef REGAMEDLL_FIXES
+			if (m_iId == WEAPON_C4) {
+				m_pPlayer->m_bHasC4 = false;
+				m_pPlayer->pev->body = 0;
+				m_pPlayer->SetBombIcon(FALSE);
+				m_pPlayer->SetProgressBarTime(0);
+			}
+
 			m_pPlayer->pev->weapons &= ~(1 << m_iId);
 
 			// No more weapon
 			if ((m_pPlayer->pev->weapons & ~(1 << WEAPON_SUIT)) == 0) {
 				m_pPlayer->m_iHideHUD |= HIDEHUD_WEAPONS;
 			}
-#endif
 
+			if (!m_pPlayer->m_rgpPlayerItems[PRIMARY_WEAPON_SLOT]) {
+				m_pPlayer->m_bHasPrimary = false;
+			}
+#endif
+			success = true;
 		}
 	}
 
 	Kill();
+
+	return success;
 }
 
 int CBasePlayerItem::AddToPlayer(CBasePlayer *pPlayer)
@@ -1840,7 +1855,12 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 	pPlayer->OnTouchingWeapon(this);
 
 	bool bRemove = true;
-	bool bEmitSound = false;
+
+#ifdef REGAMEDLL_FIXES 
+	CBasePlayerItem *givenItem = nullptr;
+#else
+	bool givenItem = false;
+#endif 
 
 	// go through my weapons and try to give the usable ones to the player.
 	// it's important the the player be given ammo first, so the weapons code doesn't refuse
@@ -1974,7 +1994,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 							if (pPlayer->AddPlayerItem(pItem))
 							{
 								pItem->AttachToPlayer(pPlayer);
-								bEmitSound = true;
+								givenItem = pItem;
 							}
 
 							// unlink this weapon from the box
@@ -2011,7 +2031,7 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 						// there we will see only get one grenade. Next step - pick it up, do check again `entity_dump`,
 						// but this time we'll see them x2.
 
-						bEmitSound = true;
+						givenItem = true;
 						pPlayer->GiveNamedItem(grenadeName);
 
 						// unlink this weapon from the box
@@ -2033,7 +2053,11 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 				if (pPlayer->AddPlayerItem(pItem))
 				{
 					pItem->AttachToPlayer(pPlayer);
-					bEmitSound = true;
+#ifdef REGAMEDLL_FIXES
+					givenItem = pItem;
+#else 
+					givenItem = true;
+#endif
 				}
 
 				// unlink this weapon from the box
@@ -2067,9 +2091,21 @@ void CWeaponBox::Touch(CBaseEntity *pOther)
 		}
 	}
 
-	if (bEmitSound)
+	if (givenItem)
 	{
 		EMIT_SOUND(ENT(pPlayer->pev), CHAN_ITEM, "items/gunpickup2.wav", VOL_NORM, ATTN_NORM);
+
+#ifdef REGAMEDLL_FIXES 
+		// BUGBUG: weaponbox links gun to player, then ammo is given
+		// so FShouldSwitchWeapon's CanHolster (which checks ammo) check inside AddPlayerItem
+		// return FALSE, causing an unarmed player to not deploy any weaponbox grenade
+		if (pPlayer->m_pActiveItem != givenItem && CSGameRules()->FShouldSwitchWeapon(pPlayer, givenItem))
+		{
+			// This re-check is done after ammo is given 
+			// so it ensures player properly deploys grenade from floor
+			pPlayer->SwitchWeapon(givenItem);
+		}
+#endif
 	}
 
 	if (bRemove)
