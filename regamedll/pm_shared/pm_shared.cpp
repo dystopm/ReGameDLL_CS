@@ -2507,7 +2507,7 @@ void EXT_FUNC __API_HOOK(PM_Jump)()
 	{
 		PM_PlayStepSound(PM_MapTextureTypeStepType(pmove->chtexturetype), fvol);
 	}
-	
+
 #ifdef REGAMEDLL_ADD
 	// See if user can super long jump?
 	bool cansuperjump = (pmove->PM_Info_ValueForKey(pmove->physinfo, "slj")[0] == '1');
