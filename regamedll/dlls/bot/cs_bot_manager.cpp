@@ -630,10 +630,14 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 			{
 				CONSOLE_ECHO("Ambiguous\n");
 			}
-			else
+			else if (found)
 			{
 				CONSOLE_ECHO("Current place set to '%s'\n", found->GetName());
 				SetNavPlace(found->GetID());
+			}
+			else
+			{
+				CONSOLE_ECHO("Error - place name '%s' no exists in phrases BotChatter.db\n", msg);
 			}
 		}
 	}
@@ -1448,6 +1452,7 @@ void CCSBotManager::SetLooseBomb(CBaseEntity *bomb)
 	if (bomb)
 	{
 		m_looseBombArea = TheNavAreaGrid.GetNearestNavArea(&bomb->pev->origin);
+		DbgAssert(m_looseBombArea); // TODO: Need investigation and find out why it cannot find nearest area for a lost bomb, just catch it
 	}
 	else
 	{

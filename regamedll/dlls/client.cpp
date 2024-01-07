@@ -673,7 +673,7 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 	CBaseEntity *pTarget = nullptr;
 	pPlayer->m_pIntroCamera = UTIL_FindEntityByClassname(nullptr, "trigger_camera");
 
-#ifndef REGAMEDLL_FIXES 
+#ifndef REGAMEDLL_FIXES
 	if (g_pGameRules && g_pGameRules->IsMultiplayer())
 	{
 		CSGameRules()->m_bMapHasCameras = (pPlayer->m_pIntroCamera != nullptr);
@@ -696,8 +696,8 @@ void EXT_FUNC ClientPutInServer(edict_t *pEntity)
 		pPlayer->pev->angles = CamAngles;
 		pPlayer->pev->v_angle = pPlayer->pev->angles;
 
-		pPlayer->m_fIntroCamTime = 
-#ifdef REGAMEDLL_FIXES 
+		pPlayer->m_fIntroCamTime =
+#ifdef REGAMEDLL_FIXES
 			(CSGameRules()->m_bMapHasCameras <= 1) ? 0.0 : // no need to refresh cameras if map has only one
 #endif
 			gpGlobals->time + 6;
@@ -4855,7 +4855,12 @@ void EXT_FUNC UpdateClientData(const edict_t *ent, int sendweapons, struct clien
 	}
 
 	cd->flags = pev->flags;
+#ifdef REGAMEDLL_FIXES
+	cd->health = max(pev->health, 0.0f);
+#else
 	cd->health = pev->health;
+#endif
+
 	cd->viewmodel = MODEL_INDEX(STRING(pev->viewmodel));
 	cd->waterlevel = pev->waterlevel;
 	cd->watertype = pev->watertype;

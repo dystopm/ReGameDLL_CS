@@ -3088,7 +3088,7 @@ void CHalfLifeMultiplay::CheckLevelInitialized()
 		// This determines the maximum number of players allowed on each
 		m_iSpawnPointCount_Terrorist = UTIL_CountEntities("info_player_deathmatch");
 		m_iSpawnPointCount_CT = UTIL_CountEntities("info_player_start");
-#ifdef REGAMEDLL_FIXES 
+#ifdef REGAMEDLL_FIXES
 		m_bMapHasCameras = UTIL_CountEntities("trigger_camera");
 #endif
 		m_bLevelInitialized = true;
@@ -3582,7 +3582,7 @@ void CHalfLifeMultiplay::ClientDisconnected(edict_t *pClient)
 			{
 				pPlayer->DropPlayerItem("weapon_c4");
 			}
-	
+
 			if (pPlayer->m_bHasDefuser)
 			{
 #ifdef REGAMEDLL_FIXES
@@ -4878,7 +4878,7 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(ChangeLevel)()
 
 	// find the map to change to
 	char *mapcfile = (char *)CVAR_GET_STRING("mapcyclefile");
-	assert(mapcfile != nullptr);
+	Assert(mapcfile != nullptr);
 
 	szCommands[0] = '\0';
 	szRules[0] = '\0';
@@ -4914,7 +4914,7 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(ChangeLevel)()
 		{
 			keeplooking = false;
 
-			assert(item != nullptr);
+			Assert(item != nullptr);
 
 			if (item->minplayers != 0)
 			{
@@ -5250,33 +5250,39 @@ int CHalfLifeMultiplay::GetRarityOfKill(CBaseEntity *pKiller, CBasePlayer *pVict
 	if (pVictim->m_bHeadshotKilled)
 		iRarity |= KILLRARITY_HEADSHOT;
 
-	// The killer player kills the victim through the walls
-	if (pVictim->GetDmgPenetrationLevel() > 0)
-		iRarity |= KILLRARITY_PENETRATED;
-
 	// The killer player was blind
-	if (pKiller && pKiller->IsPlayer())
+	CBasePlayer *pKillerPlayer = static_cast<CBasePlayer *>(pKiller);
+	if (pKillerPlayer && pKillerPlayer->IsPlayer())
 	{
-		CBasePlayer *pKillerPlayer = static_cast<CBasePlayer *>(pKiller);
-		if (pKillerPlayer->IsBlind())
-			iRarity |= KILLRARITY_KILLER_BLIND;
-
-		// The killer player kills the victim with a sniper rifle with no scope
 		WeaponClassType weaponClass = AliasToWeaponClass(killerWeaponName);
-		if (weaponClass == WEAPONCLASS_SNIPERRIFLE && pKillerPlayer->m_iClientFOV == DEFAULT_FOV)
-			iRarity |= KILLRARITY_NOSCOPE;
+		if (pKillerPlayer != pVictim
+			&& weaponClass != WEAPONCLASS_NONE
+			&& weaponClass != WEAPONCLASS_KNIFE
+			&& weaponClass != WEAPONCLASS_GRENADE)
+		{
+			// The killer player kills the victim through the walls
+			if (pVictim->GetDmgPenetrationLevel() > 0)
+				iRarity |= KILLRARITY_PENETRATED;
 
-		// The killer player kills the victim through smoke
-		const Vector inEyePos = pKillerPlayer->EyePosition();
-		if (TheCSBots()->IsLineBlockedBySmoke(&inEyePos, &pVictim->pev->origin))
-			iRarity |= KILLRARITY_THRUSMOKE;
+			if (pKillerPlayer->IsFullyBlind())
+				iRarity |= KILLRARITY_KILLER_BLIND;
+
+			// The killer player kills the victim with a sniper rifle with no scope
+			if (weaponClass == WEAPONCLASS_SNIPERRIFLE && pKillerPlayer->m_iClientFOV == DEFAULT_FOV)
+				iRarity |= KILLRARITY_NOSCOPE;
+
+			// The killer player kills the victim through smoke
+			const Vector inEyePos = pKillerPlayer->EyePosition();
+			if (TheCSBots()->IsLineBlockedBySmoke(&inEyePos, &pVictim->pev->origin))
+				iRarity |= KILLRARITY_THRUSMOKE;
+		}
 
 		// Calculate # of unanswered kills between killer & victim
 		// This is plus 1 as this function gets called before the stat is updated
 		// That is done so that the domination and revenge will be calculated prior
 		// to the death message being sent to the clients
 		int iAttackerEntityIndex = pKillerPlayer->entindex();
-		assert(iAttackerEntityIndex >= 0 && iAttackerEntityIndex < MAX_CLIENTS);
+		Assert(iAttackerEntityIndex > 0 && iAttackerEntityIndex <= MAX_CLIENTS);
 
 		int iKillsUnanswered = pVictim->CSPlayer()->m_iNumKilledByUnanswered[iAttackerEntityIndex - 1] + 1;
 		if (iKillsUnanswered == CS_KILLS_FOR_DOMINATION || pKillerPlayer->CSPlayer()->IsPlayerDominated(pVictim->entindex() - 1))

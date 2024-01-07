@@ -82,10 +82,6 @@ const char *CDeadHEV::m_szPoses[] =
 	"deadtable"
 };
 
-#ifndef REGAMEDLL_API
-entvars_t *g_pevLastInflictor;
-#endif
-
 LINK_ENTITY_TO_CLASS(player, CBasePlayer, CCSPlayer)
 
 #ifdef REGAMEDLL_API
@@ -2455,7 +2451,7 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 		HintMessage("#Hint_cannot_play_because_tk", TRUE, TRUE);
 	}
 
-	if ((pev->health < -9000 && iGib != GIB_NEVER) || iGib == GIB_ALWAYS)
+	if (ShouldGibPlayer(iGib))
 	{
 
 #ifndef REGAMEDLL_FIXES
@@ -6508,8 +6504,6 @@ void EXT_FUNC CBasePlayer::__API_HOOK(ImpulseCommands)()
 			else
 				iOn = 0;
 
-			assert(gmsgLogo > 0);
-
 			MESSAGE_BEGIN(MSG_ONE, gmsgLogo, nullptr, pev);
 				WRITE_BYTE(iOn);
 			MESSAGE_END();
@@ -7147,9 +7141,6 @@ void CBasePlayer::SendAmmoUpdate()
 		{
 			m_rgAmmoLast[i] = m_rgAmmo[i];
 
-			assert(m_rgAmmo[i] >= 0);
-			assert(m_rgAmmo[i] <= 255);
-
 			// send "Ammo" update message
 			MESSAGE_BEGIN(MSG_ONE, gmsgAmmoX, nullptr, pev);
 				WRITE_BYTE(i);
@@ -7431,8 +7422,6 @@ void EXT_FUNC CBasePlayer::__API_HOOK(UpdateClientData)()
 	{
 		m_iClientBattery = int(pev->armorvalue);
 
-		assert(gmsgBattery > 0);
-
 		// send "armor" update message
 		MESSAGE_BEGIN(MSG_ONE, gmsgBattery, nullptr, pev);
 			WRITE_SHORT(int(pev->armorvalue));
@@ -7514,8 +7503,6 @@ void EXT_FUNC CBasePlayer::__API_HOOK(UpdateClientData)()
 
 	if (m_iTrain & TRAIN_NEW)
 	{
-		assert(gmsgTrain > 0);
-
 		// send "train hud" update message
 		MESSAGE_BEGIN(MSG_ONE, gmsgTrain, nullptr, pev);
 			WRITE_BYTE(m_iTrain & 0xF);

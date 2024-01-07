@@ -448,7 +448,7 @@ public:
 	edict_t *EntSelectSpawnPoint_OrigFunc();
 	void PlayerDeathThink_OrigFunc();
 	void Observer_Think_OrigFunc();
-	
+
 	CCSPlayer *CSPlayer() const;
 #endif // REGAMEDLL_API
 
@@ -590,6 +590,7 @@ public:
 	bool IsReloading() const;
 	bool HasTimePassedSinceDeath(float duration) const;
 	bool IsBlind() const { return (m_blindUntilTime > gpGlobals->time); }
+	bool IsFullyBlind(const float flPeekTime = 0.6f) const { return m_blindAlpha >= 255 && m_blindFadeTime > (flPeekTime * 2.0f) && (m_blindStartTime + m_blindHoldTime + flPeekTime) > gpGlobals->time; }
 	bool IsAutoFollowAllowed() const { return (gpGlobals->time > m_allowAutoFollowTime); }
 	void InhibitAutoFollow(float duration) { m_allowAutoFollowTime = gpGlobals->time + duration; }
 	void AllowAutoFollow() { m_allowAutoFollowTime = 0; }
@@ -641,6 +642,7 @@ public:
 	bool ShouldToShowAccount(CBasePlayer *pReceiver) const;
 	bool ShouldToShowHealthInfo(CBasePlayer *pReceiver) const;
 	const char *GetKillerWeaponName(entvars_t *pevInflictor, entvars_t *pevKiller) const;
+	bool ShouldGibPlayer(int iGib);
 
 	CBasePlayerItem *GetItemByName(const char *itemName);
 	CBasePlayerItem *GetItemById(WeaponIdType weaponID);
@@ -954,7 +956,24 @@ inline bool CBasePlayer::HasTimePassedSinceDeath(float duration) const
 inline CCSPlayer *CBasePlayer::CSPlayer() const {
 	return reinterpret_cast<CCSPlayer *>(this->m_pEntity);
 }
-#endif
+#else // !REGAMEDLL_API
+
+// Determine whether player can be gibbed or not
+inline bool CBasePlayer::ShouldGibPlayer(int iGib)
+{
+	// Always gib the player regardless of incoming damage
+	if (iGib == GIB_ALWAYS)
+		return true;
+
+	// Gib the player if health is below the gib damage threshold
+	if (pev->health < GIB_PLAYER_THRESHOLD && iGib != GIB_NEVER)
+		return true;
+
+	// do not gib the player
+	return false;
+}
+
+#endif // !REGAMEDLL_API
 
 #ifdef REGAMEDLL_FIXES
 
@@ -976,9 +995,6 @@ inline CBasePlayer *UTIL_PlayerByIndexSafe(int playerIndex)
 	return pPlayer;
 }
 
-#ifndef REGAMEDLL_API
-extern entvars_t *g_pevLastInflictor;
-#endif
 extern CBaseEntity *g_pLastSpawn;
 extern CBaseEntity *g_pLastCTSpawn;
 extern CBaseEntity *g_pLastTerroristSpawn;
