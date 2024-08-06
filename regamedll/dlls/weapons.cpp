@@ -518,7 +518,11 @@ void CBasePlayerItem::Materialize()
 	UTIL_SetOrigin(pev, pev->origin);
 	SetTouch(&CBasePlayerItem::DefaultTouch);
 
-	if (g_pGameRules->IsMultiplayer())
+	if (g_pGameRules->IsMultiplayer()
+#ifdef REGAMEDLL_FIXES
+		&& g_pGameRules->WeaponShouldRespawn(this) == GR_WEAPON_RESPAWN_NO
+#endif
+	)
 	{
 		if (!CanDrop())
 		{
@@ -555,8 +559,12 @@ void CBasePlayerItem::CheckRespawn()
 {
 	switch (g_pGameRules->WeaponShouldRespawn(this))
 	{
-		case GR_WEAPON_RESPAWN_YES:
+		case GR_WEAPON_RESPAWN_YES: {
+#ifdef REGAMEDLL_FIXES
+			Respawn();
+#endif
 			return;
+		}
 		case GR_WEAPON_RESPAWN_NO:
 			return;
 	}
@@ -574,6 +582,10 @@ CBaseEntity *CBasePlayerItem::Respawn()
 	{
 		// invisible for now
 		pNewWeapon->pev->effects |= EF_NODRAW;
+
+#ifdef REGAMEDLL_ADD
+		pNewWeapon->pev->spawnflags &= ~SF_NORESPAWN;
+#endif
 
 		// no touch
 		pNewWeapon->SetTouch(nullptr);
@@ -712,6 +724,41 @@ LINK_HOOK_CLASS_VOID_CHAIN(CBasePlayerWeapon, KickBack, (float up_base, float la
 
 void EXT_FUNC CBasePlayerWeapon::__API_HOOK(KickBack)(float up_base, float lateral_base, float up_modifier, float lateral_modifier, float up_max, float lateral_max, int direction_change)
 {
+#ifdef REGAMEDLL_ADD
+	real_t flKickUp = up_base;
+	float flKickLateral = lateral_base;
+
+	if (m_iShotsFired > 1) // consider == 0 case 
+	{
+		flKickUp += m_iShotsFired * up_modifier;
+		flKickLateral += m_iShotsFired * lateral_modifier;
+	}
+
+	if (up_max == 0.0f) // boundaryless vertical kick
+	{
+		m_pPlayer->pev->punchangle.x -= flKickUp;
+	}
+	else if (m_pPlayer->pev->punchangle.x > -up_max) // do not kick when already out of boundaries
+	{
+		m_pPlayer->pev->punchangle.x = Q_max<real_t>(m_pPlayer->pev->punchangle.x - flKickUp, -up_max);
+	}
+
+	if (lateral_max == 0.0f) // boundaryless horizontal kick
+	{
+		m_pPlayer->pev->punchangle.y += flKickLateral * (m_iDirection * 2 - 1);
+	}
+	else if (Q_fabs(m_pPlayer->pev->punchangle.y) < lateral_max) // do not kick when already out of boundaries
+	{
+		m_pPlayer->pev->punchangle.y = (m_iDirection == 1) ?
+			Q_min(m_pPlayer->pev->punchangle.y + flKickLateral, lateral_max) :
+			Q_max(m_pPlayer->pev->punchangle.y - flKickLateral, -lateral_max);
+	}
+
+	if (direction_change > 0 && !RANDOM_LONG(0, direction_change)) // be sure to not waste RNG consumption
+	{
+		m_iDirection = !m_iDirection;
+	}
+#else
 	real_t flKickUp;
 	float flKickLateral;
 
@@ -752,6 +799,7 @@ void EXT_FUNC CBasePlayerWeapon::__API_HOOK(KickBack)(float up_base, float later
 	{
 		m_iDirection = !m_iDirection;
 	}
+#endif
 }
 
 void CBasePlayerWeapon::FireRemaining(int &shotsFired, float &shootTime, BOOL bIsGlock)
