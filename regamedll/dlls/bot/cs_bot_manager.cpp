@@ -578,14 +578,16 @@ void CCSBotManager::ServerCommand(const char *pcmd)
 	}
 	else if (FStrEq(pcmd, "bot_nav_save"))
 	{
-		GET_GAME_DIR(buffer);
-		Q_strcat(buffer, "\\");
-		Q_strcat(buffer, CBotManager::GetNavMapFilename());
+		char gd[64]{};
+		GET_GAME_DIR(gd);
 
-		if (SaveNavigationMap(buffer))
-			CONSOLE_ECHO("Navigation map '%s' saved.\n", buffer);
+		char filename[MAX_OSPATH];
+		Q_snprintf(filename, sizeof(filename), "%s\\%s", gd, CBotManager::GetNavMapFilename());
+
+		if (SaveNavigationMap(filename))
+			CONSOLE_ECHO("Navigation map '%s' saved.\n", filename);
 		else
-			CONSOLE_ECHO("ERROR: Cannot save navigation map '%s'.\n", buffer);
+			CONSOLE_ECHO("ERROR: Cannot save navigation map '%s'.\n", filename);
 	}
 	else if (FStrEq(pcmd, "bot_nav_load"))
 	{
@@ -887,12 +889,10 @@ void CCSBotManager::MaintainBotQuota()
 	if (m_isLearningMap)
 		return;
 
-	int totalHumansInGame = UTIL_HumansInGame();
-	int humanPlayersInGame = UTIL_HumansInGame(IGNORE_SPECTATORS);
-	int spectatorPlayersInGame = UTIL_SpectatorsInGame();
+	int humanPlayersInGame = UTIL_HumansInGame();
 
 	// don't add bots until local player has been registered, to make sure he's player ID #1
-	if (!IS_DEDICATED_SERVER() && totalHumansInGame == 0)
+	if (!IS_DEDICATED_SERVER() && humanPlayersInGame == 0)
 		return;
 
 	int desiredBotCount = int(cv_bot_quota.value);
@@ -947,7 +947,7 @@ void CCSBotManager::MaintainBotQuota()
 	// wait for a player to join, if necessary
 	if (cv_bot_join_after_player.value > 0.0)
 	{
-		if (humanPlayersInGame == 0 && spectatorPlayersInGame == 0)
+		if (humanPlayersInGame == 0)
 			desiredBotCount = 0;
 	}
 
@@ -1211,6 +1211,13 @@ void CCSBotManager::ValidateMapData()
 			found = true;
 			isLegacy = false;
 		}
+		else if (FClassnameIs(pEntity->pev, "func_escapezone"))
+		{
+			m_gameScenario = SCENARIO_ESCAPE;
+			found = true;
+			isLegacy = false;
+		}
+
 
 		if (found)
 		{

@@ -29,6 +29,7 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 | swapteams                           | Swap the teams and restart the game (1 sec delay to restart by default).<br/> Args: <br/>`0` - swap teams without restart. <br/> `>0.001` - time delay in seconds to restart the round after swap. |
 | give                                | Give weapon command.<br/> Args:<br/><weapon_name><br/>Usage:<br/>`give weapon_ak47`<br/>`give weapon_usp`<br/><br/>NOTE: `sv_cheats 1` required. |
 | impulse 255                         | Give all weapons.<br/><br/>NOTE: `sv_cheats 1` required. |
+| impulse 200                         | Noclip with air acceleration.<br/><br/>NOTE: `sv_cheats 1` required. |
 
 ## Configuration (cvars)
 <details>
@@ -127,11 +128,11 @@ This means that plugins that do binary code analysis (Orpheu for example) probab
 
 ## How to install zBot for CS 1.6?
 * Extract all the files from an [archive](regamedll/extra/zBot/bot_profiles.zip?raw=true)
-* Enter `-bots` option at the command line HLDS
+* Enable CVar `bot_enable 1` in `cstrike/game_init.cfg` (if this config file does not exist, create it)
 
-## How to install CSCZ hostage AI for CS 1.6?
+## How to install CS:CZ hostage AI for CS 1.6?
 * Extract all the files from an [archive](regamedll/extra/HostageImprov/host_improv.zip?raw=true)
-* Enter `-host-improv` option at the command line HLDS
+* Enable CVar `hostage_ai_enable 1` in `cstrike/game_init.cfg` (if this config file does not exist, create it)
 
 ## Build instructions
 ### Checking requirements
