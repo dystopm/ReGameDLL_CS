@@ -1015,6 +1015,31 @@ void CBaseEntity::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 	}
 }
 
+float BulletDamage(Bullet iBulletType, TraceResult *ptr)
+{
+	float ret;
+
+	switch (iBulletType)
+	{
+	case BULLET_NONE:               return 50;
+	case BULLET_PLAYER_MP5:         return gSkillData.plrDmgMP5;
+	case BULLET_PLAYER_357:         return gSkillData.plrDmg357;
+	case BULLET_PLAYER_BUCKSHOT:    return ((1 - ptr->flFraction) * 20);
+	case BULLET_MONSTER_MP5:        return gSkillData.monDmgMP5;
+	case BULLET_MONSTER_12MM:       return gSkillData.monDmg12MM;
+	//case BULLET_PLAYER_CROWBAR:
+	//case BULLET_PLAYER_9MM:
+	//case BULLET_PLAYER_45ACP:
+	//case BULLET_PLAYER_338MAG:
+	//case BULLET_PLAYER_762MM:
+	//case BULLET_PLAYER_556MM:
+	//case BULLET_PLAYER_50AE:
+	//case BULLET_PLAYER_57MM:
+	//case BULLET_PLAYER_357SIG:
+	case BULLET_MONSTER_9MM:
+	default:                        return gSkillData.monDmg9MM;
+	}
+}
 
 LINK_HOOK_CLASS_VOID_CHAIN(CBaseEntity, FireBullets, (ULONG cShots, VectorRef vecSrc, VectorRef vecDirShooting, VectorRef vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, entvars_t *pevAttacker), cShots, vecSrc, vecDirShooting, vecSpread, flDistance, iBulletType, iTracerFreq, iDamage, pevAttacker)
 
@@ -1099,6 +1124,13 @@ void CBaseEntity::__API_HOOK(FireBullets)(ULONG cShots, VectorRef vecSrc, Vector
 		{
 			CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
 
+#ifdef REGAMEDLL_FIXES
+			if (tr.iHitgroup == HITGROUP_SHIELD)
+			{
+				pEntity->HitShield(iDamage ? iDamage : BulletDamage((Bullet)iBulletType, &tr), &tr);
+			}
+			else
+#endif
 			if (iDamage)
 			{
 				pEntity->TraceAttack(pevAttacker, iDamage, vecDir, &tr, DMG_BULLET | ((iDamage > 16) ? DMG_ALWAYSGIB : DMG_NEVERGIB));
@@ -1107,32 +1139,21 @@ void CBaseEntity::__API_HOOK(FireBullets)(ULONG cShots, VectorRef vecSrc, Vector
 			}
 			else
 			{
-				float flDamage;
+				float flDamage = BulletDamage((Bullet)iBulletType, &tr);
 
 				switch (iBulletType)
 				{
-				case BULLET_PLAYER_MP5:
-					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
-					break;
 				case BULLET_PLAYER_BUCKSHOT:
-					flDamage = ((1 - tr.flFraction) * 20);
 					pEntity->TraceAttack(pevAttacker, int(flDamage), vecDir, &tr, DMG_BULLET);
 					break;
-				case BULLET_PLAYER_357:
-					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET);
-					break;
 				case BULLET_MONSTER_9MM:
-					pEntity->TraceAttack(pevAttacker, gSkillData.monDmg9MM, vecDir, &tr, DMG_BULLET);
-					TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
-					DecalGunshot(&tr, iBulletType, false, pev, false);
-					break;
 				case BULLET_MONSTER_MP5:
-					pEntity->TraceAttack(pevAttacker, gSkillData.monDmgMP5, vecDir, &tr, DMG_BULLET);
+					pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_BULLET);
 					TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 					DecalGunshot(&tr, iBulletType, false, pev, false);
 					break;
 				case BULLET_MONSTER_12MM:
-					pEntity->TraceAttack(pevAttacker, gSkillData.monDmg12MM, vecDir, &tr, DMG_BULLET);
+					pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_BULLET);
 
 					if (!tracer)
 					{
@@ -1141,7 +1162,6 @@ void CBaseEntity::__API_HOOK(FireBullets)(ULONG cShots, VectorRef vecSrc, Vector
 					}
 					break;
 				case BULLET_NONE:
-					flDamage = 50;
 					pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_CLUB);
 					TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 
@@ -1151,8 +1171,10 @@ void CBaseEntity::__API_HOOK(FireBullets)(ULONG cShots, VectorRef vecSrc, Vector
 						UTIL_DecalTrace(&tr, DECAL_GLASSBREAK1 + RANDOM_LONG(0, 2));
 					}
 					break;
+				// case BULLET_PLAYER_MP5:
+				// case BULLET_PLAYER_357:
 				default:
-					pEntity->TraceAttack(pevAttacker, gSkillData.monDmg9MM, vecDir, &tr, DMG_BULLET);
+					pEntity->TraceAttack(pevAttacker, flDamage, vecDir, &tr, DMG_BULLET);
 					break;
 				}
 			}
@@ -1243,9 +1265,18 @@ void CBaseEntity::__API_HOOK(FireBuckshots)(ULONG cShots, VectorRef vecSrc, Vect
 		// do damage, paint decals
 		if (tr.flFraction != 1.0f)
 		{
-			CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
+			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
 			float flDamage = ((1 - tr.flFraction) * iDamage);
-			pEntity->TraceAttack(pevAttacker, int(flDamage), vecDir, &tr, DMG_BULLET);
+#ifdef REGAMEDLL_FIXES
+			if (tr.iHitgroup == HITGROUP_SHIELD)
+			{
+				pEntity->HitShield(flDamage, &tr);
+			}
+			else
+#endif
+			{
+				pEntity->TraceAttack(pevAttacker, int(flDamage), vecDir, &tr, DMG_BULLET);
+			}
 		}
 
 		// make bullet trails

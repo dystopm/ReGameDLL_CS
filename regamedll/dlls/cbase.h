@@ -654,3 +654,4 @@ EXT_FUNC void OnGameShutdown();
 
 void SetObjectCollisionBox(entvars_t *pev);
 CBaseEntity *FindGlobalEntity(string_t classname, string_t globalname);
+float BulletDamage(Bullet iBulletType, TraceResult *ptr);
