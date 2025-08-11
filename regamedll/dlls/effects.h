@@ -142,6 +142,7 @@ public:
 
 	void SetStartEntity(int entityIndex);
 	void SetEndEntity(int entityIndex);
+	static void SetEndEntity(entity_state_t *es, int entityIndex);
 
 	void SetStartAttachment(int attachment) { pev->sequence = (pev->sequence & 0x0FFF) | ((attachment & 0xF) << 12); }
 	void SetEndAttachment(int attachment) { pev->skin = (pev->skin & 0x0FFF) | ((attachment & 0xF) << 12); }

@@ -134,6 +134,12 @@ void CBeam::SetEndEntity(int entityIndex)
 	pev->aiment = INDEXENT(entityIndex);
 }
 
+void CBeam::SetEndEntity(entity_state_t *es, int entityIndex)
+{
+	es->skin = (entityIndex & 0x0FFF) | (es->skin & 0xF000);
+	es->aiment = entityIndex;
+}
+
 const Vector &CBeam::GetStartPos()
 {
 	if (GetType() == BEAM_ENTS)

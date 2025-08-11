@@ -4668,7 +4668,20 @@ BOOL EXT_FUNC AddToFullPack(struct entity_state_s *state, int e, edict_t *ent, e
 		state->health = int(ent->v.health);
 	}
 	else
+	{
 		state->playerclass = ent->v.playerclass;
+
+#ifdef REGAMEDLL_FIXES
+		if (state->entityType == ENTITY_BEAM    // processing a beam
+			&& host->v.iuser1 == OBS_IN_EYE     // while watching a player in first person
+			&& state->aiment == host->v.iuser2) // which is attached to my observed player
+		{
+			// keep attachment index, just change entity index
+			// to make client think beam comes from spectator's viewmodel
+			CBeam::SetEndEntity(state, hostnum + 1);
+		}
+#endif
+	}
 
 	state->iuser4 = ent->v.iuser4;
 	return TRUE;
