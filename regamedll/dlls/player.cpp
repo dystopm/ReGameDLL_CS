@@ -2316,7 +2316,17 @@ void EXT_FUNC CBasePlayer::__API_HOOK(Killed)(entvars_t *pevAttacker, int iGib)
 #endif
 	}
 
-	if (!m_bKilledByBomb)
+#ifdef REGAMEDLL_FIXES
+	// took from PlayerKilled
+	m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+	m_iTrain = (TRAIN_NEW | TRAIN_OFF);
+	SET_VIEW(ENT(pev), ENT(pev));
+
+	// https://github.com/rehlds/ReGameDLL_CS/pull/815
+	pev->flags &= ~FL_FROZEN;
+#endif
+
+	if (!m_bKilledByBomb) // not a C4 kill
 	{
 		g_pGameRules->PlayerKilled(this, pevAttacker, GetLastInflictor());
 	}

@@ -3936,15 +3936,15 @@ LINK_HOOK_CLASS_VOID_CUSTOM_CHAIN(CHalfLifeMultiplay, CSGameRules, PlayerKilled,
 void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pInflictor)
 {
 	DeathNotice(pVictim, pKiller, pInflictor);
-#ifdef REGAMEDLL_FIXES
-	pVictim->pev->flags &= ~FL_FROZEN;
-#endif
-	pVictim->m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
+
 	pVictim->m_iDeaths++;
 	pVictim->m_bNotKilled = false;
 	pVictim->m_bEscaped = false;
+#ifndef REGAMEDLL_FIXES
+	pVictim->m_afPhysicsFlags &= ~PFLAG_ONTRAIN;
 	pVictim->m_iTrain = (TRAIN_NEW | TRAIN_OFF);
 	SET_VIEW(ENT(pVictim->pev), ENT(pVictim->pev));
+#endif
 
 	CBasePlayer *peKiller = nullptr;
 	CBaseEntity *ktmp = CBaseEntity::Instance(pKiller);
@@ -3956,11 +3956,12 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 	else if (ktmp && ktmp->Classify() == CLASS_VEHICLE)
 	{
 		CBasePlayer *pDriver = static_cast<CBasePlayer *>(((CFuncVehicle *)ktmp)->m_pDriver);
+
+		if (pDriver
 #ifdef REGAMEDLL_FIXES
-		if (pDriver && !pDriver->has_disconnected)
-#else
-		if (pDriver)
+			&& !pDriver->has_disconnected
 #endif
+			)
 		{
 			pKiller = pDriver->pev;
 			peKiller = static_cast<CBasePlayer *>(pDriver);
@@ -3976,22 +3977,25 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 		// do nothing
 	}
 	else
-#endif
-	// Did the player kill himself?
-	if (pVictim->pev == pKiller)
-	{
-		// Players lose a frag for killing themselves
-		pVictim->pev->frags -= 1;
-	}
-	else if (peKiller && peKiller->IsPlayer())
+#endif.
+	// case when: killed by a player but not himself
+	if (pVictim->pev != pKiller && peKiller && peKiller->IsPlayer())
 	{
 		// if a player dies in a deathmatch game and the killer is a client, award the killer some points
-		CBasePlayer *killer = GetClassPtr<CCSPlayer>((CBasePlayer *)pKiller);
+		CBasePlayer *killer = GetClassPtr<CCSPlayer>((CBasePlayer *)pKiller); // TODO: why not using peKiller instead?
 
+#ifdef REGAMEDLL_FIXES
 		if (g_pGameRules->PlayerRelationship(pVictim, killer) == GR_TEAMMATE)
+#else
+		if (pVictim->m_iTeam == peKiller->m_iTeam)
+#endif
 		{
 			// if a player dies by from teammate
+#ifdef REGAMEDLL_FIXES
+			killer->AddPoints(-IPointsForKill(killer, pVictim), TRUE);
+#else
 			pKiller->frags -= IPointsForKill(peKiller, pVictim);
+#endif
 
 			killer->AddAccount(PAYBACK_FOR_KILLED_TEAMMATES, RT_TEAMMATES_KILLED);
 			killer->m_iTeamKills++;
@@ -4000,25 +4004,36 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 			ClientPrint(killer->pev, HUD_PRINTCENTER, "#Killed_Teammate");
 			ClientPrint(killer->pev, HUD_PRINTCONSOLE, "#Game_teammate_kills", UTIL_dtos1(killer->m_iTeamKills));
 
+
+			if (autokick.value
 #ifdef REGAMEDLL_ADD
-			if (autokick.value && max_teamkills.value && killer->m_iTeamKills >= (int)max_teamkills.value)
+				&& max_teamkills.value && killer->m_iTeamKills >= (int)max_teamkills.value
 #else
-			if (autokick.value && killer->m_iTeamKills == 3)
+				&& killer->m_iTeamKills == 3)
 #endif
+				)
 			{
+
+				ClientPrint(killer->pev,
+					HUD_PRINTCONSOLE,
 #ifdef REGAMEDLL_FIXES
-				ClientPrint(killer->pev, HUD_PRINTCONSOLE, "#Banned_For_Killing_Teammates");
+					"#Banned_For_Killing_Teammates"
 #else
-				ClientPrint(killer->pev, HUD_PRINTCONSOLE, "#Banned_For_Killing_Teamates");
+					"#Banned_For_Killing_Teamates"
 #endif
+				);
+
 				int iUserID = GETPLAYERUSERID(killer->edict());
 				if (iUserID != -1)
 				{
+					SERVER_COMMAND(UTIL_VarArgs(
 #ifdef REGAMEDLL_FIXES
-					SERVER_COMMAND(UTIL_VarArgs("kick #%d \"For killing too many teammates\"\n", iUserID));
+						"kick #%d \"For killing too many teammates\"\n",
 #else
-					SERVER_COMMAND(UTIL_VarArgs("kick # %d\n", iUserID));
+						"kick # %d\n",
 #endif
+						iUserID
+					));
 				}
 			}
 
@@ -4031,7 +4046,12 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 		else
 		{
 			// if a player dies in a deathmatch game and the killer is a client, award the killer some points
+#ifdef REGAMEDLL_FIXES
+			killer->AddPoints(IPointsForKill(killer, pVictim), TRUE);
+			killer->m_flNextDecalTime = gpGlobals->time;
+#else
 			pKiller->frags += IPointsForKill(peKiller, pVictim);
+#endif
 
 			if (pVictim->m_bIsVIP)
 			{
@@ -4060,9 +4080,9 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 
 		FireTargets("game_playerkill", peKiller, peKiller, USE_TOGGLE, 0);
 	}
+	// case when: killed by world/entity or by himself
 	else
 	{
-		// killed by the world
 		pKiller->frags -= 1;
 	}
 
@@ -4080,6 +4100,7 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 		WRITE_SHORT(pVictim->m_iTeam);
 	MESSAGE_END();
 
+#ifndef REGAMEDLL_FIXES
 	// killers score, if it's a player
 	CBaseEntity *ep = CBaseEntity::Instance(pKiller);
 
@@ -4098,6 +4119,7 @@ void EXT_FUNC CHalfLifeMultiplay::__API_HOOK(PlayerKilled)(CBasePlayer *pVictim,
 		// let the killer paint another decal as soon as he'd like.
 		PK->m_flNextDecalTime = gpGlobals->time;
 	}
+#endif
 }
 
 LINK_HOOK_CLASS_VOID_CUSTOM_CHAIN(CHalfLifeMultiplay, CSGameRules, DeathNotice, (CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pevInflictor), pVictim, pKiller, pevInflictor)
