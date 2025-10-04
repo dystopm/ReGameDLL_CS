@@ -1265,7 +1265,7 @@ void CBaseEntity::__API_HOOK(FireBuckshots)(ULONG cShots, VectorRef vecSrc, Vect
 		// do damage, paint decals
 		if (tr.flFraction != 1.0f)
 		{
-			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
+			CBaseEntity *pEntity = CBaseEntity::Instance(tr.pHit);
 			float flDamage = ((1 - tr.flFraction) * iDamage);
 #ifdef REGAMEDLL_FIXES
 			if (tr.iHitgroup == HITGROUP_SHIELD)
